@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>角色卡工坊 v20 - AI 原创放映室设计 - beautify 加失败案例示范 - style 包裹 + _user_ 前缀 - 严格按用户输入 - lumeow 兼容</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #0e0e10;
+  color: #e0e0e0;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+.app { max-width: 760px; margin: 0 auto; padding: 12px; padding-bottom: 80px; }
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid #2a2a2a; margin-bottom: 12px;
+  position: sticky; top: 0; background: #0e0e10; z-index: 50;
+}
+header h1 { font-size: 17px; font-weight: 500; }
+nav button, .nav-btn {
+  background: transparent; border: 1px solid #3a3a3a; color: #e0e0e0;
+  padding: 6px 12px; border-radius: 4px; margin-left: 4px;
+  cursor: pointer; font-size: 13px; font-family: inherit;
+}
+nav button.active { background: #2a2a2a; border-color: #5a5a5a; }
+button {
+  background: transparent; border: 1px solid #3a3a3a; color: #e0e0e0;
+  padding: 8px 14px; border-radius: 4px; cursor: pointer;
+  font-size: 13px; font-family: inherit; transition: all 0.15s;
+  margin-right: 4px; margin-bottom: 4px;
+}
+button:active { transform: scale(0.97); }
+button.primary { background: #1a3a5a; border-color: #2a5a8a; color: #8ab4f8; }
+button.success { background: #1a4a2a; border-color: #2a6a3a; color: #8c8; }
+button.danger { background: #4a1a1a; border-color: #6a2a2a; color: #f88; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+fieldset {
+  border: 1px solid #2a2a2a; border-radius: 6px;
+  padding: 12px; margin-bottom: 10px;
+}
+legend { padding: 0 8px; font-size: 13px; color: #aaa; }
+h2 { font-size: 16px; font-weight: 500; margin: 12px 0 8px; }
+h3 { font-size: 14px; font-weight: 500; margin: 10px 0 6px; color: #ccc; }
+h4 { font-size: 13px; font-weight: 500; margin: 8px 0 4px; color: #aaa; }
+.form-group { margin-bottom: 8px; }
+.form-group label {
+  display: block; font-size: 12px; color: #aaa;
+  margin-bottom: 3px;
+}
+.form-group label .req { color: #f88; margin-left: 2px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; background: #1a1a1c; border: 1px solid #2a2a2a;
+  color: #e0e0e0; padding: 8px 10px; border-radius: 4px;
+  font-size: 14px; font-family: inherit;
+}
+.form-group textarea { min-height: 60px; resize: vertical; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none; border-color: #4a6a8a;
+}
+.form-group small {
+  display: block; font-size: 11px; color: #888; margin-top: 3px;
+}
+.tabs {
+  display: flex; gap: 4px; margin-bottom: 10px;
+  border-bottom: 1px solid #2a2a2a; padding-bottom: 0;
+}
+.tabs .tab {
+  background: transparent; border: none; border-bottom: 2px solid transparent;
+  padding: 8px 14px; border-radius: 0; color: #888; font-size: 13px;
+  margin: 0;
+}
+.tabs .tab.active {
+  color: #e0e0e0; border-bottom-color: #5a8aca;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.panel { background: #15151a; border: 1px solid #2a2a2a; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+.status { font-size: 12px; color: #888; margin-left: 8px; }
+.status.error { color: #f88; }
+.status.success { color: #8c8; }
+.card-item {
+  background: #1a1a1c; border: 1px solid #2a2a2a; padding: 12px;
+  border-radius: 6px; margin-bottom: 8px;
+  display: flex; align-items: center;
+}
+.card-item .avatar { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; margin-right: 12px; background: #2a2a2a; }
+.card-item .info { flex: 1; min-width: 0; }
+.card-item .info h3 { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+.card-item .info p { font-size: 12px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-item .actions { display: flex; gap: 4px; flex-shrink: 0; }
+.card-item .actions button { padding: 4px 8px; font-size: 12px; }
+.preview {
+  width: 80px; height: 80px; border-radius: 6px; object-fit: cover;
+  margin-top: 4px; display: block; border: 1px solid #2a2a2a;
+}
+.hidden { display: none !important; }
+.editor-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px; gap: 8px;
+}
+.editor-header h2 { font-size: 15px; margin: 0; flex: 1; text-align: center; }
+.empty {
+  text-align: center; padding: 40px 20px; color: #666;
+}
+.empty p { margin-bottom: 12px; }
+.modal {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.75); display: none;
+  align-items: center; justify-content: center; z-index: 100;
+  padding: 16px;
+}
+.modal.active { display: flex; }
+.modal-content {
+  background: #1a1a1c; border: 1px solid #3a3a3a; border-radius: 8px;
+  padding: 20px; max-width: 100%; max-height: 90%; overflow: auto;
+  width: 100%;
+}
+.modal-content h2 { font-size: 16px; margin-bottom: 12px; }
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: #2a2a2a; color: #fff; padding: 8px 16px; border-radius: 6px;
+  font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.3s;
+  pointer-events: none; max-width: 80%; text-align: center;
+}
+.toast.show { opacity: 1; }
+.input-wrap { position: relative; display: block; }
+.input-wrap textarea,
+.input-wrap input[type="text"] { padding-right: 54px; }
+.copy-btn {
+  position: absolute; right: 4px; top: 4px;
+  padding: 2px 8px; font-size: 11px;
+  background: #1a1a1c; border: 1px solid #2a2a2a;
+  color: #888; border-radius: 3px; cursor: pointer;
+  margin: 0; z-index: 2; font-family: inherit;
+  transition: all 0.15s;
+}
+.copy-btn:active { transform: scale(0.95); }
+.copy-btn:hover { color: #e0e0e0; border-color: #4a6a8a; }
+.lumeow-tag {
+  display: inline-block;
+  background: #8b5cf6;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.template-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #374151;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.template-btn:hover {
+  background: #8b5cf6;
+  color: #fff;
+  border-color: #8b5cf6;
+}
+.lumeow-link {
+  color: #8b5cf6;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 12px;
+  user-select: none;
+}
+.beautify-help {
+  background: #15151a;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #ccc;
+}
+.beautify-help p { margin: 4px 0; }
+.field-counter {
+  font-size: 11px;
+  color: #888;
+  font-family: monospace;
+}
+.world-item {
+  background: #15151a;
+  border: 1px solid #2a2a2a;
+  border-left: 3px solid #8b5cf6;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.world-item .header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.world-item .world-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #c4b5fd;
+}
+.world-item .field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.world-item .field-row label {
+  font-size: 12px;
+  color: #aaa;
+}
+.world-item input { margin-bottom: 6px; }
+.world-item button { padding: 3px 8px; font-size: 11px; }
+.action-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #15151a; border-top: 1px solid #2a2a2a;
+  padding: 10px 12px; z-index: 30;
+  display: flex; gap: 4px; justify-content: center;
+  flex-wrap: wrap;
+}
+.action-bar button { margin: 0; flex: 1; min-width: 100px; }
+@media (max-width: 480px) {
+  .app { padding: 8px; padding-bottom: 90px; }
+  header h1 { font-size: 15px; }
+  nav button { padding: 4px 8px; font-size: 12px; }
+  button { padding: 6px 10px; font-size: 12px; }
+  .form-group input, .form-group select, .form-group textarea { font-size: 16px; /* 防止 iOS 缩放 */ }
+  .action-bar button { min-width: 0; font-size: 11px; padding: 6px 4px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>角色卡工坊</h1>
+    <nav id="nav">
+      <button class="active" data-page="list">列表</button>
+      <button data-page="settings">设置</button>
+    </nav>
+  </header>
+
+  <!-- 列表页 -->
+  <section id="listPage">
+    <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <button class="primary" id="newCardBtn">+ 新建角色卡</button>
+      <button id="importBtn">导入 JSON</button>
+      <button id="exportAllBtn">导出全部</button>
+    </div>
+    <div id="storageStatus" style="font-size: 11px; color: #666; margin-bottom: 10px;"></div>
+    <div id="cardList"></div>
+  </section>
+
+  <!-- 编辑器页 -->
+  <section id="editorPage" class="hidden">
+    <div class="editor-header">
+      <button id="backBtn">返回</button>
+      <h2 id="editorTitle">新建角色卡</h2>
+      <button id="saveBtn" class="success">保存</button>
+    </div>
+
+    <!-- 想法区 -->
+    <div id="ideaPanel" class="panel">
+      <h3>一句话描述</h3>
+      <p style="font-size: 12px; color: #888; margin-bottom: 10px;">随便写你想要什么角色，AI 全自动填完整卡</p>
+      <div class="form-group">
+        <textarea id="roleIdea" rows="4" placeholder="例：黑发男生，冷白皮，穿黑色皮衣，狭长眼睛，外冷内热，禁欲偏执风，都市恋人剧情"></textarea>
+      </div>
+      <div class="form-group">
+        <label style="font-size:12px;color:#888;display:block;margin-bottom:6px;">参考图（可选，AI 看了会按图设计放映室风格）</label>
+        <input type="file" id="refImages" accept="image/*" multiple style="font-size:12px;color:#aaa;" />
+        <div id="refImagesPreview" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
+      </div>
+      <button id="aiCreateBtn" class="primary">AI 创建角色卡</button>
+      <button id="aiPlayerRoomBtn" style="margin-left:8px;padding:8px 12px;background:#2a5a3a;border:none;color:#e0e0e0;border-radius:4px;font-size:13px;">生成放映室</button>
+      <button id="aiBeautifyBtn" style="margin-left:8px;padding:8px 12px;background:#3a2a5a;border:none;color:#e0e0e0;border-radius:4px;font-size:13px;">生成美化</button>
+      <span id="aiStatus" class="status"></span>
+    </div>
+
+    <!-- 三大标签页（AI 生成后显示） -->
+    <div id="tabPanel" class="hidden">
+      <div class="tabs">
+        <button class="tab active" data-tab="info">展示信息</button>
+        <button class="tab" data-tab="role">角色设定</button>
+        <button class="tab" data-tab="story">故事设定</button>
+      </div>
+
+      <!-- 展示信息 -->
+      <div id="infoTab" class="tab-content active">
+        <fieldset>
+          <legend>基础分类</legend>
+          <div class="form-group">
+            <label>作品分类 <span class="req">*</span></label>
+            <select id="infoCategory">
+              <option value="近代现代">近代现代</option>
+              <option value="架空历史">架空历史</option>
+              <option value="幻想未来">幻想未来</option>
+              <option value="仙侠古风">仙侠古风</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>作品标签（逗号分隔，用于平台检索）</label>
+            <input type="text" id="infoTags" placeholder="现代, 腹黑, 年上, 都市">
+          </div>
+          <div class="form-group">
+            <label>内容分级 <span class="req">*</span></label>
+            <select id="infoRating">
+              <option value="unrestricted">无限制（可暧昧/成人向）</option>
+              <option value="limited">限制（仅普通日常）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>作品来源</label>
+            <select id="infoSource">
+              <option value="original">原创</option>
+              <option value="fanfic">非原创（二次改编）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>自定义设置</label>
+            <select id="infoCustom">
+              <option value="allow">允许玩家修改人设</option>
+              <option value="lock">锁定设定（不允许修改）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>作品可见性</label>
+            <select id="infoVisibility">
+              <option value="public">公开（所有人可见）</option>
+              <option value="private">私密（仅自己）</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>展示信息</legend>
+          <div class="form-group">
+            <label>作品名称 <span class="req">*</span>（20字内）</label>
+            <input type="text" id="infoName" maxlength="20">
+          </div>
+          <div class="form-group">
+            <label>作品简介 <span class="req">*</span>（800字内）</label>
+            <textarea id="infoIntro" maxlength="800" rows="5"></textarea>
+          </div>
+          <div class="form-group">
+            <label>作品头像</label>
+            <input type="file" id="infoAvatarFile" accept="image/*">
+            <img id="infoAvatarPreview" class="preview hidden">
+            <input type="hidden" id="infoAvatar">
+          </div>
+          <div class="form-group">
+            <label>圆形头像</label>
+            <input type="file" id="infoCoverFile" accept="image/*">
+            <img id="infoCoverPreview" class="preview hidden">
+            <input type="hidden" id="infoCover">
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- 角色设定 -->
+      <div id="roleTab" class="tab-content">
+        <fieldset>
+          <legend>角色设定 #1</legend>
+          <div class="form-group">
+            <label>角色名称 <span class="req">*</span>（20字内）</label>
+            <input type="text" id="roleName" maxlength="20">
+          </div>
+          <div class="form-group">
+            <label>年龄</label>
+            <input type="text" id="roleAge" placeholder="例：25">
+          </div>
+
+          <h4>1. 基础信息</h4>
+          <div class="form-group">
+            <label>1.1 外貌特征</label>
+            <textarea id="roleAppearance" rows="2" maxlength="200"></textarea>
+          </div>
+          <div class="form-group">
+            <label>1.2 核心性格与特质</label>
+            <textarea id="rolePersonality" rows="2" maxlength="200"></textarea>
+          </div>
+          <div class="form-group">
+            <label>1.3 内心世界与核心驱动力</label>
+            <textarea id="roleHeart" rows="2" maxlength="200"></textarea>
+          </div>
+          <div class="form-group">
+            <label>1.4 角色的矛盾/两面性</label>
+            <textarea id="roleConflict" rows="2" maxlength="200"></textarea>
+          </div>
+
+          <h4>2. 核心互动模式</h4>
+          <div class="form-group">
+            <label>2.1 特定情况下的行为反应</label>
+            <textarea id="roleSituation" rows="2" maxlength="200"></textarea>
+          </div>
+          <div class="form-group">
+            <label>2.2 不同关系下的行为反应</label>
+            <textarea id="roleRelation" rows="2" maxlength="200"></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>用户设定（玩家本人）</legend>
+          <div class="form-group">
+            <label>玩家默认角色名 <span class="req">*</span>（20字内）</label>
+            <input type="text" id="playerName" maxlength="20">
+          </div>
+          <div class="form-group">
+            <label>玩家默认性别</label>
+            <select id="playerGender">
+              <option value="female">女</option>
+              <option value="male">男</option>
+              <option value="other">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>玩家初始设定 <span class="req">*</span>（300字内）</label>
+            <textarea id="playerInitial" rows="4" maxlength="300"></textarea>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- 故事设定 -->
+      <div id="storyTab" class="tab-content">
+        <fieldset>
+          <legend>故事 1</legend>
+          <div class="form-group">
+            <label>故事图片</label>
+            <input type="file" id="storyImageFile" accept="image/*">
+            <img id="storyImagePreview" class="preview hidden">
+            <input type="hidden" id="storyImage">
+          </div>
+          <div class="form-group">
+            <label>故事名称 <span class="req">*</span>（15字内）</label>
+            <input type="text" id="storyName" maxlength="15">
+          </div>
+          <div class="form-group">
+            <label>故事简介 <span class="req">*</span></label>
+            <textarea id="storyIntro" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>故事标签 <span class="req">*</span>（至少1个，逗号分隔）</label>
+            <input type="text" id="storyTags" placeholder="都市, 恋爱, 现代">
+          </div>
+          <div class="form-group">
+            <label>放映室代码 <span class="lumeow-tag">手机/微信/微博/偷看手机</span></label>
+            <div style="margin-bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" class="template-btn" data-template="wechat">📱 微信聊天</button>
+              <button type="button" class="template-btn" data-template="weibo">📰 微博主页</button>
+              <button type="button" class="template-btn" data-template="phone">🔓 偷看手机</button>
+              <button type="button" class="template-btn" data-template="chat">💬 聊天记录</button>
+              <button type="button" class="template-btn" data-template="call">📞 来电界面</button>
+              <button type="button" class="template-btn" data-template="profile">🎴 人物档案</button>
+              <button type="button" class="template-btn" data-template="ancient">📜 古风竹简</button>
+            </div>
+            <textarea id="storyPlayerRoom" rows="4" placeholder="简单写一句想法，AI 一键创建时会按你的想法补全为完整代码：
+例 1：角色手机模拟器，深色科技感，4 个 app
+例 2：微信聊天记录，气泡 5 条
+例 3：偷看角色手机，密码 1234，解锁后看聊天
+例 4：微博朋友圈，3 条动态
+留空 = AI 自己选一个最贴角色人设的玩法"></textarea>
+            <div style="margin: 6px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <input type="file" id="playerRoomImageFile" accept="image/*" style="font-size: 12px;">
+              <img id="playerRoomImagePreview" class="preview hidden" style="max-height: 60px; border-radius: 4px;">
+              <button type="button" id="clearPlayerRoomImageBtn" class="danger hidden" style="font-size: 12px; padding: 2px 8px;">删图</button>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);cursor:pointer;">
+                <input type="checkbox" id="embedImageToggle" style="margin:0;"> 嵌入图片到代码
+                <span title="强烈建议取消勾选！lumeow 放映室会截断大段 base64 图片，导致裂图。取消勾选则 AI 看图设计但不嵌入 base64，代码更小更稳定">(?)</span>
+              </label>
+            </div>
+            <input type="hidden" id="playerRoomImage">
+            <small>用户先简单描述玩法和风格，AI 一键创建时会补全为完整 HTML+CSS+JS 互动代码（用 \`\`\`html ... \`\`\` 包裹）。可上传图片，AI 会在代码里引用图片（&lt;img src="data:..."/&gt;）。普通使用留空，AI 自动选最贴人设的玩法。</small>
+          </div>
+          <div class="form-group">
+            <label>开场白-正文 <span class="req">*</span>（支持标签语法）</label>
+            <textarea id="storyOpening" rows="6"></textarea>
+            <small>标签规则：&lt;message&gt;对话&lt;/message&gt; 包裹人物对话 / &lt;emphasize&gt;强调&lt;/emphasize&gt; 包裹强调内容 / `名字` 表人物</small>
+          </div>
+          <div class="form-group">
+            <label>开场白-后置状态栏（每次 AI 回复结尾固定出现）</label>
+            <textarea id="storyStatus" rows="3" placeholder="可以写需求让 AI 生成，如：科技蓝状态面板，显示掌控欲/心跳/体温。AI 会自动把 HTML 骨架填到这里，CSS 皮肤追加到下方的【美化代码】里"></textarea>
+            <div style="margin-top:6px;">
+              <button type="button" id="aiGenStatusBarBtn" style="font-size:12px;padding:4px 12px;">✨ AI生成状态栏</button>
+              <small style="margin-left:8px;">机制：HTML 骨架 → 状态栏 / CSS 皮肤 → 美化代码</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>世界观（可添加多个条目）</label>
+            <div id="worldList"></div>
+            <button id="addWorldBtn" style="margin-top: 6px;">+ 添加世界观条目</button>
+          </div>
+          <div class="form-group">
+            <label>美化代码 <span class="lumeow-tag" id="beautifyHelpBtn">美化样式速查</span></label>
+            <div class="beautify-help hidden" id="beautifyHelpContent">
+              <p>为了显示不出错，请将代码分开存放：</p>
+              <p>1. 美化代码：所有 CSS 样式、颜色、布局（用 &lt;style&gt; 包裹）</p>
+              <p>2. 开场白和状态栏：纯 HTML 结构，不要在里面写任何样式代码，尤其不要写 inline-css</p>
+              <p>你可以把下方指令和你的代码发给 AI，它会自动帮你拆分，你只需把结果填入对应位置即可。</p>
+              <p><span class="lumeow-link" id="beautifyCopyBtn">点击一键复制指令</span></p>
+            </div>
+            <textarea id="storyBeautify" rows="6" placeholder="<style>
+._user_root{background:#faf7f2;color:#333;font-family:system-ui,-apple-system,sans-serif;padding:16px;border-radius:12px;}
+._user_bubble{background:#2a1a1a;color:#fff;border-radius:12px;padding:8px 12px;margin:4px 0;}
+._user_action{color:#888;font-style:italic;margin:4px 0;}
+</style>"></textarea>
+            <div style="margin: 6px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <input type="file" id="beautifyImageFile" accept="image/*" style="font-size: 12px;">
+              <img id="beautifyImagePreview" class="preview hidden" style="max-height: 60px; border-radius: 4px;">
+              <button type="button" id="clearBeautifyImageBtn" class="danger hidden" style="font-size: 12px; padding: 2px 8px;">删图</button>
+            </div>
+            <input type="hidden" id="beautifyImage">
+            <small>用于集中管理美化的所有视觉样式（字体/配色/气泡/间距/状态栏等）。本部分不计入 Token。必须用 <code>&lt;style&gt;</code> 标签包裹。复杂玩法（手机/微信模拟器）请写到上方"放映室代码"。</small>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </section>
+
+  <!-- 设置页 -->
+  <section id="settingsPage" class="hidden">
+    <h2>设置</h2>
+    <fieldset>
+      <legend>文本 API（AI 写作用）</legend>
+      <div class="form-group">
+        <label>API 类型</label>
+        <select id="textApiType">
+          <option value="openai">OpenAI 兼容（OpenAI / DeepSeek / 硅基等）</option>
+          <option value="coze">扣子 API（v3）</option>
+          <option value="custom">自定义</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>API Key <span class="req">*</span></label>
+        <input type="password" id="textApiKey" placeholder="sk-xxx">
+      </div>
+      <div class="form-group" id="modelGroup">
+        <label>模型名 <span class="req">*</span></label>
+        <input type="text" id="textApiModel" placeholder="gpt-4o-mini / deepseek-chat / glm-4-flash">
+      </div>
+      <div class="form-group">
+        <label>Base URL</label>
+        <input type="text" id="textApiBase" placeholder="https://api.openai.com/v1">
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+        <button type="button" class="preset-btn" data-key="sk-ws-H.RPIPLYI.asp3.MEUCIGM9HeTu2Rdm1YYaZDQ0uo7CLVSqZLxYUwRvKO8RQ7Q5AiEArz9XNkJjTIPJCyxcsSKg1ZX6sNy5_gqlxQu-m4DeFC4" data-model="qwen-vl-plus" data-base="https://dashscope.aliyuncs.com/compatible-mode/v1" style="font-size:11px;padding:3px 8px;">🟢 通义千问VL(可识图)</button>
+        <button type="button" class="preset-btn" data-key="" data-model="deepseek-chat" data-base="https://api.deepseek.com/v1" style="font-size:11px;padding:3px 8px;">🔵 DeepSeek(纯文本)</button>
+      </div>
+      <button id="testTextApiBtn">测试文本 API</button>
+      <span id="textApiStatus" class="status"></span>
+      <div style="margin-top:12px;padding:12px;background:var(--bg-elevated,rgba(0,0,0,0.05));border-radius:8px;border:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <b style="font-size:13px;">💰 Token 用量统计</b>
+          <button type="button" id="resetTokenUsageBtn" style="font-size:11px;padding:2px 8px;" class="danger">重置</button>
+        </div>
+        <div id="tokenUsageDisplay"></div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:6px;">※ 本地统计，仅参考。真实额度请看阿里云百炼控制台</div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>数据管理</legend>
+      <button id="exportAllBtn2">导出所有数据</button>
+      <button id="importAllBtn">导入数据</button>
+      <button class="danger" id="clearAllBtn">清空所有数据</button>
+    </fieldset>
+  </section>
+</div>
+
+<!-- 底部操作栏 -->
+<div id="actionBar" class="action-bar hidden">
+  <button id="previewBtn">预览</button>
+  <button id="saveDraftBtn">暂存草稿</button>
+  <button id="copyLumeowBtn" class="primary">复制 lumeow 格式</button>
+  <button id="downloadJsonBtn">下载 JSON</button>
+</div>
+
+<!-- 预览模态 -->
+<div class="modal" id="previewModal">
+  <div class="modal-content">
+    <h2 id="previewTitle"></h2>
+    <div id="previewBody" style="font-size: 14px; line-height: 1.7;"></div>
+    <div style="margin-top: 16px;">
+      <button id="closePreviewBtn" class="primary">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 隐藏文件输入 -->
+<input type="file" id="importFile" accept=".json" class="hidden">
+<input type="file" id="importAllFile" accept=".json" class="hidden">
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== 数据存储 ====================
+const STORAGE = {
+  CARDS: 'ccw:cards:v1',
+  SETTINGS: 'ccw:settings:v1'
+};
+
+function loadSettings() {
+  const defaults = {
+    textApi: { type: 'openai', key: '', model: 'qwen-vl-plus', base: 'https://dashscope.aliyuncs.com/compatible-mode/v1' }
+  };
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE.SETTINGS));
+    if (s && s.textApi) return s;
+    return defaults;
+  } catch (e) {
+    return defaults;
+  }
+}
+function saveSettings(s) { localStorage.setItem(STORAGE.SETTINGS, JSON.stringify(s)); }
+function loadCards() { try { return JSON.parse(localStorage.getItem(STORAGE.CARDS)) || []; } catch (e) { return []; } }
+function saveCards(c) { localStorage.setItem(STORAGE.CARDS, JSON.stringify(c)); }
+
+function newCard() {
+  return {
+    id: 'card_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    info: {
+      category: '近代现代', tags: '', rating: 'unrestricted', source: 'original',
+      custom: 'allow', visibility: 'public',
+      name: '', intro: '', avatar: '', cover: ''
+    },
+    role: {
+      name: '', age: '',
+      appearance: '', personality: '', heart: '', conflict: '',
+      situation: '', relation: ''
+    },
+    player: {
+      name: '', gender: 'female', initial: ''
+    },
+    story: {
+      image: '', name: '', intro: '', tags: '',
+      playerRoom: '', opening: '', status: '',
+      world: [],
+      beautify: ''
+    }
+  };
+}
+
+// 把任意（可能残缺的）卡数据补全成完整结构，避免导入/旧数据导致崩溃
+function normalizeCard(raw) {
+  const base = newCard();
+  let r;
+  try { r = JSON.parse(JSON.stringify(raw || {})); } catch (e) { r = {}; }
+  if (r.id) base.id = r.id;
+  if (r.createdAt) base.createdAt = r.createdAt;
+  base.updatedAt = r.updatedAt || Date.now();
+  if (r.info && typeof r.info === 'object') Object.assign(base.info, r.info);
+  if (r.role && typeof r.role === 'object') Object.assign(base.role, r.role);
+  if (r.player && typeof r.player === 'object') Object.assign(base.player, r.player);
+  if (r.story && typeof r.story === 'object') {
+    Object.assign(base.story, r.story);
+    if (!Array.isArray(base.story.world)) base.story.world = [];
+  }
+  return base;
+}
+
+// ==================== UI 状态 ====================
+let currentCard = null;
+let currentPage = 'list';
+let currentTab = 'info';
+
+// ==================== Toast ====================
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ==================== 页面切换 ====================
+function showPage(p) {
+  document.getElementById('listPage').classList.toggle('hidden', p !== 'list');
+  document.getElementById('editorPage').classList.toggle('hidden', p !== 'editor');
+  document.getElementById('settingsPage').classList.toggle('hidden', p !== 'settings');
+  document.getElementById('actionBar').classList.toggle('hidden', p !== 'editor' || !currentCard);
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('active', b.dataset.page === p));
+  currentPage = p;
+  if (p === 'settings') loadSettingsUI();
+}
+
+document.getElementById('nav').addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') {
+    showPage(e.target.dataset.page);
+  }
+});
+
+// ==================== 列表页 ====================
+function renderCardList() {
+  const list = loadCards();
+  const c = document.getElementById('cardList');
+  updateStorageStatus(list);
+  if (list.length === 0) {
+    c.innerHTML = '<div class="empty"><p>还没有角色卡</p><p>点上面"新建角色卡"开始</p><p style="font-size: 11px; color: #555; margin-top: 16px;">iOS Safari 可能清空 localStorage，记得用"导出全部"备份</p></div>';
+    return;
+  }
+  c.innerHTML = list.map(x => `
+    <div class="card-item">
+      <img class="avatar" src="${x.info.avatar || ''}" onerror="this.style.display='none'">
+      <div class="info">
+        <h3>${escapeHtml(x.info.name || '未命名')}</h3>
+        <p>${escapeHtml(x.info.category || '未分类')} · ${escapeHtml(x.role.name || '未填角色')} · ${new Date(x.updatedAt).toLocaleDateString()}</p>
+      </div>
+      <div class="actions">
+        <button data-id="${x.id}" data-action="edit">编辑</button>
+        <button data-id="${x.id}" data-action="copy" class="primary">复制</button>
+        <button data-id="${x.id}" data-action="delete" class="danger">删</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return (s || '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function updateStorageStatus(list) {
+  const el = document.getElementById('storageStatus');
+  if (!el) return;
+  if (!list || list.length === 0) {
+    el.textContent = '本地存储：0 张卡';
+    return;
+  }
+  const latest = Math.max(...list.map(x => x.updatedAt || 0));
+  const ago = formatTimeAgo(latest);
+  el.textContent = '本地存储：' + list.length + ' 张卡 · 最近更新 ' + ago;
+}
+
+function formatTimeAgo(ts) {
+  if (!ts) return '未知';
+  const diff = Date.now() - ts;
+  if (diff < 60000) return '刚刚';
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
+  if (diff < 7 * 86400000) return Math.floor(diff / 86400000) + ' 天前';
+  return new Date(ts).toLocaleDateString();
+}
+
+document.getElementById('cardList').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const action = btn.dataset.action;
+  const cards = loadCards();
+  const card = cards.find(c => c.id === id);
+  if (!card) return;
+  if (action === 'edit') {
+    currentCard = normalizeCard(card);
+    loadCardToEditor();
+    showPage('editor');
+  } else if (action === 'copy') {
+    copyToClipboard(JSON.stringify(card, null, 2));
+    toast('已复制 JSON 到剪贴板');
+  } else if (action === 'delete') {
+    if (confirm('确定删除这个角色卡？')) {
+      saveCards(cards.filter(c => c.id !== id));
+      renderCardList();
+      toast('已删除');
+    }
+  }
+});
+
+document.getElementById('newCardBtn').addEventListener('click', () => {
+  currentCard = newCard();
+  document.getElementById('editorTitle').textContent = '新建角色卡';
+  document.getElementById('ideaPanel').classList.remove('hidden');
+  document.getElementById('tabPanel').classList.add('hidden');
+  showPage('editor');
+});
+
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change', (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.info && data.role) {
+        const card = normalizeCard(data);
+        card.id = 'card_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        card.updatedAt = Date.now();
+        const cards = loadCards(); cards.push(card); saveCards(cards);
+        renderCardList(); toast('已导入');
+      } else toast('格式不对');
+    } catch (err) { toast('解析失败'); }
+  };
+  reader.readAsText(f);
+  e.target.value = '';
+});
+
+document.getElementById('backBtn').addEventListener('click', () => {
+  // 返回前自动存盘，避免丢数据
+  if (currentCard) {
+    const tabPanel = document.getElementById('tabPanel');
+    if (tabPanel && !tabPanel.classList.contains('hidden')) {
+      try {
+        saveCardFromEditor();
+        const cards = loadCards();
+        const idx = cards.findIndex(c => c.id === currentCard.id);
+        if (idx >= 0) cards[idx] = currentCard; else cards.push(currentCard);
+        saveCards(cards);
+      } catch (e) {}
+    }
+  }
+  showPage('list');
+  renderCardList();
+});
+
+// ==================== 自动保存（防止数据丢失） ====================
+let autoSaveTimer = null;
+function scheduleAutoSave() {
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => {
+    if (!currentCard) return;
+    const tabPanel = document.getElementById('tabPanel');
+    if (tabPanel && tabPanel.classList.contains('hidden')) return; // 还没 AI 生成
+    try {
+      saveCardFromEditor();
+      const cards = loadCards();
+      const idx = cards.findIndex(c => c.id === currentCard.id);
+      if (idx >= 0) cards[idx] = currentCard; else cards.push(currentCard);
+      saveCards(cards); // 真正写入 localStorage，刷新不丢
+    } catch (e) { console.warn('auto save error:', e); }
+  }, 1000);
+}
+['infoTab', 'roleTab', 'storyTab'].forEach(tabId => {
+  const tab = document.getElementById(tabId);
+  if (!tab) return;
+  tab.addEventListener('input', scheduleAutoSave);
+  tab.addEventListener('change', scheduleAutoSave);
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  if (!currentCard) return;
+  saveCardFromEditor();
+  const cards = loadCards();
+  const idx = cards.findIndex(c => c.id === currentCard.id);
+  if (idx >= 0) cards[idx] = currentCard;
+  else cards.push(currentCard);
+  saveCards(cards);
+  document.getElementById('editorTitle').textContent = currentCard.info.name || '已保存';
+  toast('已保存');
+});
+
+// ==================== 编辑器 ====================
+function loadCardToEditor() {
+  if (!currentCard) return;
+  document.getElementById('editorTitle').textContent = currentCard.info.name || '编辑中';
+  // 编辑已有卡：tabPanel 始终显示（一句话描述可重新调 AI 生成）
+  document.getElementById('tabPanel').classList.remove('hidden');
+  document.getElementById('ideaPanel').classList.remove('hidden');
+  // info
+  setVal('infoCategory', currentCard.info.category);
+  setVal('infoTags', currentCard.info.tags);
+  setVal('infoRating', currentCard.info.rating);
+  setVal('infoSource', currentCard.info.source);
+  setVal('infoCustom', currentCard.info.custom);
+  setVal('infoVisibility', currentCard.info.visibility);
+  setVal('infoName', currentCard.info.name);
+  setVal('infoIntro', currentCard.info.intro);
+  setVal('infoAvatar', currentCard.info.avatar);
+  setVal('infoCover', currentCard.info.cover);
+  showPreview('infoAvatar', currentCard.info.avatar);
+  showPreview('infoCover', currentCard.info.cover);
+  // role
+  setVal('roleName', currentCard.role.name);
+  setVal('roleAge', currentCard.role.age);
+  setVal('roleAppearance', currentCard.role.appearance);
+  setVal('rolePersonality', currentCard.role.personality);
+  setVal('roleHeart', currentCard.role.heart);
+  setVal('roleConflict', currentCard.role.conflict);
+  setVal('roleSituation', currentCard.role.situation);
+  setVal('roleRelation', currentCard.role.relation);
+  // player
+  setVal('playerName', currentCard.player.name);
+  setVal('playerGender', currentCard.player.gender);
+  setVal('playerInitial', currentCard.player.initial);
+  // story
+  setVal('storyImage', currentCard.story.image);
+  setVal('storyName', currentCard.story.name);
+  setVal('storyIntro', currentCard.story.intro);
+  setVal('storyTags', currentCard.story.tags);
+  setVal('storyPlayerRoom', currentCard.story.playerRoom);
+  setVal('storyOpening', currentCard.story.opening);
+  setVal('storyStatus', currentCard.story.status);
+  setVal('storyBeautify', currentCard.story.beautify);
+  showPreview('storyImage', currentCard.story.image);
+  renderWorldList();
+}
+
+function saveCardFromEditor() {
+  if (!currentCard) return;
+  currentCard.info = {
+    category: getVal('infoCategory'), tags: getVal('infoTags'),
+    rating: getVal('infoRating'), source: getVal('infoSource'),
+    custom: getVal('infoCustom'), visibility: getVal('infoVisibility'),
+    name: getVal('infoName'), intro: getVal('infoIntro'),
+    avatar: getVal('infoAvatar'), cover: getVal('infoCover')
+  };
+  currentCard.role = {
+    name: getVal('roleName'), age: getVal('roleAge'),
+    appearance: getVal('roleAppearance'), personality: getVal('rolePersonality'),
+    heart: getVal('roleHeart'), conflict: getVal('roleConflict'),
+    situation: getVal('roleSituation'), relation: getVal('roleRelation')
+  };
+  currentCard.player = {
+    name: getVal('playerName'), gender: getVal('playerGender'),
+    initial: getVal('playerInitial')
+  };
+  currentCard.story = {
+    image: getVal('storyImage'), name: getVal('storyName'),
+    intro: getVal('storyIntro'), tags: getVal('storyTags'),
+    playerRoom: getVal('storyPlayerRoom'), opening: getVal('storyOpening'),
+    status: getVal('storyStatus'), world: currentCard.story.world || [],
+    beautify: getVal('storyBeautify')
+  };
+  currentCard.updatedAt = Date.now();
+}
+
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; }
+function getVal(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+
+function showPreview(prefix, dataUrl) {
+  const p = document.getElementById(prefix + 'Preview');
+  if (!p) return;
+  if (dataUrl) { p.src = dataUrl; p.classList.remove('hidden'); }
+  else p.classList.add('hidden');
+}
+
+// 图片压缩：用 canvas 缩放到 maxSize 内 + 压缩质量，返回 base64 dataURL
+// file 可以是 File 对象或已有的 dataURL 字符串
+function compressImage(file, opts) {
+  const { maxSize = 1024, quality = 0.8, mime = 'image/jpeg' } = opts || {};
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      // 等比缩放到最长边 <= maxSize
+      if (width > maxSize || height > maxSize) {
+        if (width >= height) { height = Math.round(height * maxSize / width); width = maxSize; }
+        else { width = Math.round(width * maxSize / height); height = maxSize; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      // PNG 透明图转 JPEG 会变黑底，先铺白底
+      if (mime === 'image/jpeg') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, height); }
+      ctx.drawImage(img, 0, 0, width, height);
+      try {
+        resolve(canvas.toDataURL(mime, quality));
+      } catch (e) { reject(e); }
+    };
+    img.onerror = () => reject(new Error('图片加载失败'));
+    if (typeof file === 'string') {
+      img.src = file;
+    } else {
+      const reader = new FileReader();
+      reader.onload = (ev) => { img.src = ev.target.result; };
+      reader.onerror = () => reject(new Error('文件读取失败'));
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+// 估算 dataURL 的字节大小（base64 解码后约 = length * 3/4）
+function dataUrlBytes(dataUrl) {
+  if (!dataUrl) return 0;
+  const i = dataUrl.indexOf(',');
+  const b64 = i >= 0 ? dataUrl.slice(i + 1) : dataUrl;
+  return Math.floor(b64.length * 3 / 4);
+}
+
+// 图片上传（头像/封面/故事图）：压缩后存 base64
+['infoAvatar', 'infoCover', 'storyImage'].forEach(prefix => {
+  document.getElementById(prefix + 'File').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      // 头像/封面较小用 512，故事图用 800
+      const maxSize = (prefix === 'storyImage') ? 800 : 512;
+      const dataUrl = await compressImage(f, { maxSize, quality: 0.82 });
+      document.getElementById(prefix).value = dataUrl;
+      showPreview(prefix, dataUrl);
+      toast('图片已压缩（约 ' + Math.round(dataUrlBytes(dataUrl) / 1024) + 'KB）');
+    } catch (err) {
+      // 压缩失败退回原始读取
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById(prefix).value = ev.target.result;
+        showPreview(prefix, ev.target.result);
+      };
+      reader.readAsDataURL(f);
+    }
+  });
+});
+
+// 参考图上传（多张）：压缩后转 base64 存到预览区 img.dataset.base64，供 collectUserInputs 收集传给 AI
+window._refImages = window._refImages || [];
+(function () {
+  const input = document.getElementById('refImages');
+  if (!input) return;
+  input.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []);
+    const preview = document.getElementById('refImagesPreview');
+    if (!preview) return;
+    for (const f of files) {
+      try {
+        // 参考图压缩到 600px，传 AI 时 token 占用较小
+        const dataUrl = await compressImage(f, { maxSize: 600, quality: 0.75 });
+        const wrap = document.createElement('span');
+        wrap.style.cssText = 'position:relative;display:inline-block;';
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.dataset.base64 = dataUrl;
+        img.style.cssText = 'width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #2a2a2a;display:block;';
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.textContent = '×';
+        del.style.cssText = 'position:absolute;top:-6px;right:-6px;width:18px;height:18px;padding:0;line-height:1;border-radius:50%;background:#4a1a1a;border:1px solid #6a2a2a;color:#f88;font-size:12px;margin:0;';
+        del.addEventListener('click', () => wrap.remove());
+        wrap.appendChild(img);
+        wrap.appendChild(del);
+        preview.appendChild(wrap);
+      } catch (err) {
+        toast('参考图压缩失败已跳过：' + f.name);
+      }
+    }
+    // 允许重复选同一文件
+    e.target.value = '';
+  });
+})();
+
+// 放映室代码/美化代码的图片上传：压缩后转 base64，自动插到代码顶部 <img> 标签
+['playerRoomImage', 'beautifyImage'].forEach(prefix => {
+  const fileInput = document.getElementById(prefix + 'File');
+  if (!fileInput) return;
+  fileInput.addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      // 放映室/美化图压缩到 600px，quality 0.65 以减小 base64 体积
+      const dataUrl = await compressImage(f, { maxSize: 600, quality: 0.65 });
+      document.getElementById(prefix).value = dataUrl;
+      const preview = document.getElementById(prefix + 'Preview');
+      const clearBtn = document.getElementById('clear' + prefix.charAt(0).toUpperCase() + prefix.slice(1) + 'Btn');
+      if (preview) { preview.src = dataUrl; preview.classList.remove('hidden'); }
+      if (clearBtn) clearBtn.classList.remove('hidden');
+      // 自动把 <img src="data:..."> 插到对应 textarea 顶部
+      const ta = document.getElementById(prefix === 'playerRoomImage' ? 'storyPlayerRoom' : 'storyBeautify');
+      if (ta) {
+        const imgTag = '<img src="' + dataUrl + '" alt="用户上传图" style="max-width:100%;border-radius:8px;margin:4px 0;"/>\n';
+        // 避免重复插入（检查顶部是否已有 dataURL 引用）
+        if (!ta.value.trimStart().startsWith('<img')) ta.value = imgTag + ta.value;
+        // 触发 input 事件更新 currentCard
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      const kb = Math.round(dataUrlBytes(dataUrl) / 1024);
+      toast('图片已压缩（约 ' + kb + 'KB）');
+    } catch (err) {
+      toast('图片压缩失败：' + err.message);
+    }
+  });
+  // 删图按钮
+  const clearBtn = document.getElementById('clear' + prefix.charAt(0).toUpperCase() + prefix.slice(1) + 'Btn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      document.getElementById(prefix).value = '';
+      const preview = document.getElementById(prefix + 'Preview');
+      if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+      clearBtn.classList.add('hidden');
+      fileInput.value = '';
+      toast('已删除图片');
+    });
+  }
+});
+
+// 世界观
+function countTokens(text) {
+  if (!text) return 0;
+  // 简单估算：中文按字算，英文按词算
+  const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const englishWords = (text.replace(/[\u4e00-\u9fa5]/g, ' ').match(/[a-zA-Z0-9]+/g) || []).length;
+  return chineseChars + englishWords;
+}
+
+function renderWorldList() {
+  const c = document.getElementById('worldList');
+  const list = (currentCard && currentCard.story && currentCard.story.world) || [];
+  c.innerHTML = list.map((w, i) => `
+    <div class="world-item" data-idx="${i}">
+      <div class="header">
+        <span class="world-title">世界观 #${i + 1}</span>
+        <button data-action="delWorld" data-idx="${i}" class="danger">删</button>
+      </div>
+      <div class="field-row">
+        <label>世界观名称</label>
+        <span class="field-counter">${(w.name || '').length}/10</span>
+      </div>
+      <input type="text" data-field="name" maxlength="10" value="${escapeHtml(w.name || '')}" placeholder="世界观名称（10字内）">
+      <div class="field-row">
+        <label>世界观说明</label>
+        <span class="field-counter">Token:${countTokens(w.desc || '')}</span>
+      </div>
+      <textarea data-field="desc" rows="3" placeholder="世界观说明（家族/魔法体系/好感度变化规则等）">${escapeHtml(w.desc || '')}</textarea>
+    </div>
+  `).join('');
+  // 为新生成的输入框添加复制按钮
+  setTimeout(() => addCopyButtons(), 50);
+}
+document.getElementById('worldList').addEventListener('input', (e) => {
+  const item = e.target.closest('.world-item');
+  if (!item) return;
+  const idx = parseInt(item.dataset.idx);
+  const field = e.target.dataset.field;
+  if (!currentCard.story.world) currentCard.story.world = [];
+  if (field === 'name') {
+    currentCard.story.world[idx].name = e.target.value;
+    // 实时更新字数计数（该 item 下第一个 .field-counter）
+    const counters = item.querySelectorAll('.field-counter');
+    if (counters[0]) counters[0].textContent = `${e.target.value.length}/10`;
+  } else if (field === 'desc') {
+    currentCard.story.world[idx].desc = e.target.value;
+    // 实时更新 Token 计数（该 item 下第二个 .field-counter）
+    const counters = item.querySelectorAll('.field-counter');
+    if (counters[1]) counters[1].textContent = `Token:${countTokens(e.target.value)}`;
+  }
+});
+document.getElementById('worldList').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn || btn.dataset.action !== 'delWorld') return;
+  const idx = parseInt(btn.dataset.idx);
+  if (!currentCard.story.world) return;
+  currentCard.story.world.splice(idx, 1);
+  renderWorldList();
+});
+document.getElementById('addWorldBtn').addEventListener('click', () => {
+  if (!currentCard.story.world) currentCard.story.world = [];
+  currentCard.story.world.push({ name: '', desc: '' });
+  renderWorldList();
+});
+
+// ==================== 美化代码帮助区 ====================
+const BEAUTIFY_SPLIT_PROMPT = `你是 CSS 拆分专家。请把以下代码拆成两部分：
+1. CSS 样式（放进"美化代码"字段，用 <style> 包裹）：所有样式、颜色、布局、动画
+2. 纯 HTML 结构（放进"开场白"或"状态栏"字段）：不要包含任何样式代码，尤其不要写 inline-css 和 style 属性
+
+请按下面格式输出：
+【美化代码】
+<style>
+...
+</style>
+
+【开场白/状态栏 HTML】
+<div>...</div>
+
+原代码：
+`;
+
+document.getElementById('beautifyHelpBtn').addEventListener('click', () => {
+  document.getElementById('beautifyHelpContent').classList.toggle('hidden');
+});
+document.getElementById('beautifyCopyBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('beautifyCopyBtn');
+  const originalText = btn.textContent;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(BEAUTIFY_SPLIT_PROMPT);
+    } else {
+      // 旧浏览器 / file:// 协议降级
+      const ta = document.createElement('textarea');
+      ta.value = BEAUTIFY_SPLIT_PROMPT;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    btn.textContent = '已复制，去 AI 那边粘贴吧';
+    setTimeout(() => { btn.textContent = originalText; }, 2000);
+  } catch (err) {
+    btn.textContent = '复制失败，请手动复制';
+    setTimeout(() => { btn.textContent = originalText; }, 2000);
+  }
+});
+
+// ==================== 标签切换 ====================
+document.querySelector('.tabs').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.toggle('active', t === e.target));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.toggle('active', t.id === e.target.dataset.tab + 'Tab'));
+  currentTab = e.target.dataset.tab;
+});
+
+// ==================== AI 一键创建 ====================
+// 字段映射：DOM id → JSON 字段路径（用户已填的字段会作为约束传给 AI）
+const FIELD_MAP = {
+  infoCategory: 'info.category', infoTags: 'info.tags', infoRating: 'info.rating',
+  infoSource: 'info.source', infoCustom: 'info.custom', infoVisibility: 'info.visibility',
+  infoName: 'info.name', infoIntro: 'info.intro',
+  roleName: 'role.name', roleAge: 'role.age', roleAppearance: 'role.appearance',
+  rolePersonality: 'role.personality', roleHeart: 'role.heart', roleConflict: 'role.conflict',
+  roleSituation: 'role.situation', roleRelation: 'role.relation',
+  playerName: 'player.name', playerGender: 'player.gender', playerInitial: 'player.initial',
+  storyName: 'story.name', storyIntro: 'story.intro', storyTags: 'story.tags',
+  storyOpening: 'story.opening', storyStatus: 'story.status',
+  storyPlayerRoom: 'story.playerRoom', storyBeautify: 'story.beautify'
+};
+
+function collectUserInputs() {
+  const filled = [];
+  Object.entries(FIELD_MAP).forEach(([id, path]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = (el.value || '').trim();
+    if (v) filled.push({ path, value: v });
+  });
+  // 世界观条目
+  const worldList = (currentCard && currentCard.story && currentCard.story.world) || [];
+  const worldFilled = worldList.filter(w => (w.name || '').trim() || (w.desc || '').trim());
+  if (worldFilled.length) {
+    filled.push({ path: 'story.world', value: worldFilled.map(w => `${w.name || '(无名)'}: ${w.desc || ''}`).join('\n') });
+  }
+  return filled;
+}
+
+// 收集参考图片的 base64（供 AI 看图设计风格）。单独函数，避免混入文本字段
+function collectRefImages() {
+  const preview = document.getElementById('refImagesPreview');
+  if (!preview) return [];
+  return Array.from(preview.querySelectorAll('img'))
+    .map(img => img.dataset.base64)
+    .filter(Boolean);
+}
+
+async function aiCreate() {
+  const roleIdea = document.getElementById('roleIdea').value.trim();
+  if (!roleIdea) { toast('先写一句话描述'); return; }
+  const settings = loadSettings();
+  if (!settings.textApi.key) { toast('先去设置填 API Key'); showPage('settings'); return; }
+
+  const status = document.getElementById('aiStatus');
+  const startTime = Date.now();
+  status.textContent = 'AI 创作中... 0秒';
+  const timer = setInterval(() => {
+    status.textContent = 'AI 创作中... ' + Math.floor((Date.now() - startTime) / 1000) + '秒';
+  }, 1000);
+  document.getElementById('aiCreateBtn').disabled = true;
+
+  const sysPrompt = buildSysPrompt();
+  let userInput = `【用户的一句话描述】\n${roleIdea}\n\n请根据这段描述，自动推断：分类、标签、关系、玩家身份、故事背景。`;
+
+  // 收集用户已填的所有字段作为约束
+  const filled = collectUserInputs();
+  if (filled.length) {
+    userInput += '\n\n【用户已填的字段（请严格按下面的"约束类型"处理对应 JSON 字段）】\n';
+    filled.forEach(({ path, value }) => {
+      // 长字段（开场白/状态栏/放映室/美化/简介）截断显示，避免 prompt 过长
+      const display = value.length > 200 ? value.slice(0, 200) + '...(后略)' : value;
+      // 放映室代码/美化代码：用户填的是简单描述，AI 需要补全为完整代码
+      const isPlayerRoomOrBeautify = path === 'story.playerRoom' || path === 'story.beautify';
+      const constraintType = isPlayerRoomOrBeautify ? '【仅参考风格·本次留空】用户对放映室/美化的想法，本次请把该字段输出空字符串，用户稍后单独生成；此描述仅供你把握整体风格基调' : '【直接用】用户已填最终内容，AI 必须 1:1 照搬，不要改写/扩写';
+      userInput += `- ${path} (${constraintType}): ${display}\n`;
+    });
+  }
+
+  // 收集参考图片
+  const refImages = collectRefImages();
+  if (refImages.length) {
+    userInput += `\n\n【参考图片】\n用户上传了 ${refImages.length} 张参考图（用于视觉风格参考）。`;
+  }
+
+  try {
+    let result;
+    if (settings.textApi.type === 'coze') {
+      result = await callCozeAPI(settings.textApi, sysPrompt, userInput);
+    } else {
+      result = await callOpenAIAPI(settings.textApi, sysPrompt, userInput, refImages);
+    }
+    // 容错提取 JSON：先尝试 ```json ... ``` 块，再尝试 ``` ... ```，最后取第一个 { 到匹配的 }
+    let jsonText = null;
+    const jsonBlock = result.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    if (jsonBlock) {
+      jsonText = jsonBlock[1];
+    } else {
+      // 用括号配对找完整 JSON
+      let depth = 0, inStr = false, esc = false, start = -1;
+      for (let i = 0; i < result.length; i++) {
+        const c = result[i];
+        if (esc) { esc = false; continue; }
+        if (c === '\\' && inStr) { esc = true; continue; }
+        if (c === '"') { inStr = !inStr; continue; }
+        if (inStr) continue;
+        if (c === '{') { if (depth === 0) start = i; depth++; }
+        else if (c === '}') { depth--; if (depth === 0 && start >= 0) { jsonText = result.slice(start, i + 1); break; } }
+      }
+      if (!jsonText) {
+        const fb = result.match(/\{[\s\S]*\}/);
+        if (fb) jsonText = fb[0];
+      }
+    }
+    if (!jsonText) throw new Error('AI 返回里找不到 JSON，前 100 字：' + result.slice(0, 100));
+    let data;
+    try {
+      data = JSON.parse(jsonText);
+    } catch (e) {
+      console.log('原始返回=', result);
+      console.log('提取JSON=', jsonText);
+      let fixed = tryFixBrokenJson(jsonText);
+      if (!fixed) fixed = repairJson(jsonText);
+      if (fixed) {
+        try {
+          data = JSON.parse(fixed);
+          toast('AI 输出有点小问题，已自动修复');
+        } catch (err) {
+          throw new Error('JSON解析失败\n' + err.message + '\nAI返回前500字：' + result.slice(0, 500));
+        }
+      } else {
+        throw new Error('JSON解析失败\n' + e.message + '\nAI返回前500字：' + result.slice(0, 500));
+      }
+    }
+    applyAIData(data);
+    status.textContent = '完成';
+    status.className = 'status success';
+    toast('AI 创作完成');
+  } catch (err) {
+    status.textContent = '失败: ' + err.message;
+    status.className = 'status error';
+    toast('失败: ' + err.message);
+  } finally {
+    clearInterval(timer);
+    document.getElementById('aiCreateBtn').disabled = false;
+  }
+}
+
+function buildSysPrompt() {
+  return `你是 lumeow-ai.com 角色卡 AI 创作专家。用户只写一句话描述，AI 必须严格围绕这段描述生成完整角色卡 JSON。
+
+【★★★★ 核心约束 - 用户输入优先】
+1. 用户在 userInput 第一段【用户的一句话描述】必须被严格遵守
+2. 用户描述里明确提到的人物特征（姓名/性别/职业/性格/外貌/年龄/种族 等）必须 1:1 照搬进对应 JSON 字段
+3. 用户描述里明确提到的世界观/题材必须采用，不要换成别的
+4. 用户描述里没提到的细节（具体长相/具体经历/具体场景）AI 才能自由发挥
+5. 例：用户写「温柔男老师叫林川，25 岁，戴眼镜」，AI 必须输出 name=林川, age=25, gender=male, profession=老师，personality 含「温柔」
+
+【硬性规则】
+0. ★★★ JSON 转义铁律：所有 JSON 字符串值内部的 " 必须写成 \"，所有 \ 必须写成 \\。这包括 playerRoom / beautify 字段里的 HTML 代码（HTML 里的双引号也要转义）。违反这条整个 JSON 直接解析失败！
+1. 输出必须是合法 JSON，字段严格按下面的 schema，不要多不要少
+2. 角色人设的 4 点结构必须全部填满，每点 100-200 字
+3. 开场白-正文必须使用 lumeow 标签语法：
+   - <message>...</message> 包裹人物对话（人物说的话）
+   - <emphasize>...</emphasize> 包裹需要强调的内容
+   - 人物名字用反引号包裹，如 \`角色名\`
+4. 作品名称 ≤ 20 字，作品简介 200-500 字（不超过 800）
+5. 故事名称 ≤ 15 字，故事简介 100-200 字
+6. 玩家初始设定 200-300 字
+7. 用户在表单里已填的字段（系统会显式列出，标记了"约束类型"）：
+   - 【直接用】字段：用户已填最终内容，AI 必须 1:1 照搬进对应 JSON 字段，不要改写/扩写
+   - 放映室代码 playerRoom / 美化代码 beautify：本次一律输出空字符串（见规则9）；用户填写的相关描述仅供你把握整体风格基调，不要在本次输出里生成这两段代码
+   - 用户留空的字段才由 AI 自由发挥
+8. 如果玩家身份用户没填，AI 自行设定一个合理的玩家身份（默认都市女性+柔软性格+与角色相识场景）
+9. playerRoom 和 beautify 留空字符串，由用户单独点击"生成放映室"/"生成美化"按钮生成
+
+
+【JSON schema】
+{
+  "info": {
+    "category": "近代现代/架空历史/幻想未来/仙侠古风 之一",
+    "tags": "标签1, 标签2, 标签3, 标签4",
+    "rating": "unrestricted 或 limited",
+    "source": "original 或 fanfic",
+    "custom": "allow 或 lock",
+    "visibility": "public 或 private",
+    "name": "作品名称",
+    "intro": "作品简介（给浏览者看，介绍角色和故事风格）"
+  },
+  "role": {
+    "name": "角色名",
+    "age": "年龄（数字）",
+    "appearance": "1.1 外貌特征",
+    "personality": "1.2 核心性格与特质",
+    "heart": "1.3 内心世界与核心驱动力",
+    "conflict": "1.4 角色的矛盾/两面性",
+    "situation": "2.1 特定情况下的行为反应",
+    "relation": "2.2 不同关系下的行为反应"
+  },
+  "player": {
+    "name": "玩家默认角色名",
+    "gender": "female / male / other",
+    "initial": "玩家初始设定（外貌+性格+身份+与角色初识场景）"
+  },
+  "story": {
+    "name": "故事名称",
+    "intro": "故事简介",
+    "tags": "都市, 恋爱, 现代 等",
+    "opening": "开场白-正文（用 lumeow 标签语法：<message>对话</message>、<emphasize>强调</emphasize>、人名用反引号；200-400 字，含 1-2 段对话）",
+    "status": "开场白-后置状态栏（例：好感度：50/100，或留空）",
+    "world": [
+      { "name": "现代都市世界", "desc": "正常现代城市，没有超自然力量..." }
+    ],
+"playerRoom": "",
+    "beautify": ""
+  }
+}
+
+只输出 JSON，不要任何解释、注释、Markdown 代码块。`;
+}
+
+function applyAIData(data) {
+  if (data.info) {
+    if (!currentCard) currentCard = newCard();
+    Object.keys(data.info).forEach(k => {
+      if (['category','tags','rating','source','custom','visibility','name','intro'].includes(k)) {
+        currentCard.info[k] = data.info[k] || currentCard.info[k];
+      }
+    });
+  }
+  if (data.role) {
+    ['name','age','appearance','personality','heart','conflict','situation','relation'].forEach(k => {
+      if (data.role[k] !== undefined) currentCard.role[k] = data.role[k];
+    });
+  }
+  if (data.player) {
+    ['name','gender','initial'].forEach(k => {
+      if (data.player[k] !== undefined) currentCard.player[k] = data.player[k];
+    });
+  }
+  if (data.story) {
+    ['name','intro','tags','opening','status','playerRoom','beautify'].forEach(k => {
+      if (data.story[k] !== undefined) currentCard.story[k] = data.story[k];
+    });
+    if (Array.isArray(data.story.world)) currentCard.story.world = data.story.world;
+  }
+  // 显示 tab 面板（想法区保持可见，用户可继续写新想法让 AI 重新生成）
+  document.getElementById('tabPanel').classList.remove('hidden');
+  loadCardToEditor();
+}
+
+document.getElementById('aiCreateBtn').addEventListener('click', aiCreate);
+
+// ==================== AI 生成状态栏 ====================
+async function aiGenStatusBar() {
+  console.log('aiGenStatusBar clicked');
+  const settings = loadSettings();
+  if (!settings.textApi.key) { toast('先去设置填 API Key'); showPage('settings'); return; }
+  if (!currentCard) { toast('先创建或选中一张角色卡'); return; }
+
+  const statusPrompt = document.getElementById('storyStatus')?.value?.trim() || '';
+  const status = document.getElementById('aiStatus');
+  toast('开始生成状态栏...');
+  const startTime = Date.now();
+  status.textContent = '生成状态栏... 0秒';
+  const timer = setInterval(() => {
+    status.textContent = '生成状态栏... ' + Math.floor((Date.now() - startTime) / 1000) + '秒';
+  }, 1000);
+  document.getElementById('aiGenStatusBarBtn').disabled = true;
+
+  const sysPrompt = `你是 lumeow 角色卡状态栏设计师。请严格按照"HTML 骨架 + CSS 皮肤分离"的机制生成状态栏。
+
+【机制说明】
+- 后置状态栏字段：只能放纯 HTML，不能放 <style> 标签
+- 美化代码字段：负责全局 CSS 皮肤
+- AI 每次回复时，会根据 HTML 骨架中的空框自动填入数值
+- CSS 皮肤会自动渲染这些空框，形成漂亮卡片
+
+【状态栏内容通常包含】
+- 角色状态（如：冷静 / 兴奋 / 危险）
+- 数值/情绪指标（如：掌控欲、好感度、占有欲、理智值）
+- 身体状态（如：心跳、体温、呼吸）
+- 动作/内心活动
+- 时间/地点/氛围
+
+用户未明确时，根据角色人设自动补全合理条目。
+
+【类名规范】
+- 外层面板：.monitor-panel
+- 面板标题：.monitor-title
+- 每一行：.monitor-row
+- 标签文字：.monitor-label
+- AI 填空框（重点）：.monitor-value-box（必须留空，让 AI 填数值）
+- 高亮行：.monitor-row.highlight
+
+【格式要求】
+- statusBarHtml：纯 HTML，禁止 <style> / <script> / <html> / <head> / <body>
+- statusBarCss：完整的 <style>...</style> 块，定义 .monitor-panel / .monitor-value-box 等样式
+- 字体用系统字体，不要外链
+- 颜色风格按用户需求（科技蓝/赛博/古风/暗黑等）
+
+【输出格式】
+只输出合法 JSON，两个字段：
+- statusBarHtml：填入 lumeow 后置状态栏
+- statusBarCss：填入 lumeow 美化代码
+
+两个字段的值都用 \`\`\`html ... \`\`\` 包裹。
+JSON 字符串内双引号 " 转义为 \\"。换行用 \\n。
+< > & 直接写，不要写成 \\u003c \\u003e \\u0026。
+
+示例：
+{"statusBarHtml":"\`\`\`html\\n<div class=\\"monitor-panel\\">\\n  <div class=\\"monitor-title\\">【状态监控】</div>\\n  <div class=\\"monitor-row\\"><span class=\\"monitor-label\\">角色状态：</span><span class=\\"monitor-value-box\\"></span></div>\\n  <div class=\\"monitor-row highlight\\"><span class=\\"monitor-label\\">掌控欲：</span><span class=\\"monitor-value-box\\"></span></div>\\n  <div class=\\"monitor-row\\"><span class=\\"monitor-label\\">情绪锚点：</span><span class=\\"monitor-value-box\\"></span></div>\\n  <div class=\\"monitor-row\\"><span class=\\"monitor-label\\">内心活动：</span><span class=\\"monitor-value-box\\"></span></div>\\n  <div class=\\"monitor-row\\"><span class=\\"monitor-label\\">心跳：</span><span class=\\"monitor-value-box\\"></span></div>\\n  <div class=\\"monitor-row\\"><span class=\\"monitor-label\\">体温：</span><span class=\\"monitor-value-box\\"></span></div>\\n</div>\\n\`\`\`","statusBarCss":"\`\`\`html\\n<style>\\n.monitor-panel {\\n  background: linear-gradient(135deg, rgba(76, 240, 255, 0.08), rgba(0, 80, 120, 0.2));\\n  border: 1px solid rgba(76, 240, 255, 0.35);\\n  border-left: 3px solid #4cf0ff;\\n  border-radius: 10px;\\n  padding: 14px 16px;\\n  margin: 12px 0;\\n  color: #e8f8ff;\\n  font-family: system-ui, -apple-system, \"PingFang SC\", \"Microsoft YaHei\", sans-serif;\\n  font-size: 13px;\\n  box-shadow: 0 0 20px rgba(76, 240, 255, 0.1);\\n  position: relative;\\n  max-width: 340px;\\n}\\n.monitor-panel::before {\\n  content: '';\\n  position: absolute;\\n  top: -6px;\\n  left: 22px;\\n  width: 0;\\n  height: 0;\\n  border-left: 6px solid transparent;\\n  border-right: 6px solid transparent;\\n  border-bottom: 6px solid rgba(76, 240, 255, 0.35);\\n}\\n.monitor-title {\\n  color: #4cf0ff;\\n  font-weight: 700;\\n  margin-bottom: 10px;\\n  font-size: 14px;\\n  text-shadow: 0 0 10px rgba(76, 240, 255, 0.4);\\n}\\n.monitor-row {\\n  display: flex;\\n  justify-content: space-between;\\n  margin: 5px 0;\\n  line-height: 1.6;\\n}\\n.monitor-row.highlight .monitor-label {\\n  color: #4cf0ff;\\n  text-shadow: 0 0 8px rgba(76, 240, 255, 0.5);\\n}\\n.monitor-label {\\n  color: #8aa;\\n}\\n.monitor-value-box {\\n  color: #fff;\\n  font-weight: 600;\\n  min-width: 80px;\\n  text-align: right;\\n}\\n</style>\\n\`\`\`"}`;
+
+  const userInput = `角色：${currentCard.role?.name || '未知'}
+性格：${currentCard.role?.personality || ''}
+分类：${currentCard.info?.category || ''}
+世界观：${JSON.stringify(currentCard.story?.world || [])}
+
+【用户需求】${statusPrompt || '根据角色人设，生成一个匹配风格的精美状态栏。'}`;
+
+  try {
+    const result = await callOpenAIAPI(settings.textApi, sysPrompt, userInput, null);
+    let jsonText = null;
+    const jsonBlock = result.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    if (jsonBlock) jsonText = jsonBlock[1];
+    else {
+      let depth = 0, inStr = false, esc = false, start = -1;
+      for (let i = 0; i < result.length; i++) {
+        const c = result[i];
+        if (esc) { esc = false; continue; }
+        if (c === '\\' && inStr) { esc = true; continue; }
+        if (c === '"') { inStr = !inStr; continue; }
+        if (inStr) continue;
+        if (c === '{') { if (depth === 0) start = i; depth++; }
+        else if (c === '}') { depth--; if (depth === 0 && start >= 0) { jsonText = result.slice(start, i + 1); break; } }
+      }
+      if (!jsonText) { const fb = result.match(/\{[\s\S]*\}/); if (fb) jsonText = fb[0]; }
+    }
+    if (!jsonText) throw new Error('找不到JSON，前100字：' + result.slice(0, 100));
+    let data;
+    try { data = JSON.parse(jsonText); }
+    catch (e) {
+      let fixed = tryFixBrokenJson(jsonText);
+      if (!fixed) fixed = repairJson(jsonText);
+      if (fixed) { data = JSON.parse(fixed); toast('自动修复成功'); }
+      else throw new Error('JSON失败：' + e.message + '\n前300字：' + result.slice(0, 300));
+    }
+    if (data.statusBarHtml || data.statusBarCss) {
+      const cleanCode = (code) => {
+        let finalCode = code;
+        if (finalCode.includes('\\n')) {
+          finalCode = finalCode.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t');
+        }
+        const codeBlockMatch = finalCode.match(/```(?:html|css|[a-z]*)\s*([\s\S]*?)```/);
+        if (codeBlockMatch) finalCode = codeBlockMatch[1].trim();
+        finalCode = finalCode.replace(/\\u003c/gi, '<').replace(/\\u003e/gi, '>').replace(/\\u0026/gi, '&');
+        finalCode = finalCode.replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '');
+        return finalCode;
+      };
+
+      if (data.statusBarHtml) {
+        const htmlCode = cleanCode(data.statusBarHtml);
+        currentCard.story.status = htmlCode;
+        setVal('storyStatus', htmlCode);
+      }
+      if (data.statusBarCss) {
+        const cssCode = cleanCode(data.statusBarCss);
+        const currentBeautify = document.getElementById('storyBeautify')?.value || '';
+        // 避免重复追加相同 CSS
+        if (!currentBeautify.includes(cssCode.trim().slice(0, 80))) {
+          const newBeautify = currentBeautify ? currentBeautify + '\n\n' + cssCode : cssCode;
+          currentCard.story.beautify = newBeautify;
+          setVal('storyBeautify', newBeautify);
+        }
+      }
+
+      saveCardFromEditor();
+      toast('状态栏生成完成：HTML 已填状态栏，CSS 已追加到美化代码');
+      status.textContent = '状态栏完成';
+      status.className = 'status success';
+    }
+  } catch (err) {
+    status.textContent = '失败: ' + err.message;
+    status.className = 'status error';
+    toast('失败: ' + err.message);
+  } finally {
+    clearInterval(timer);
+    document.getElementById('aiGenStatusBarBtn').disabled = false;
+  }
+}
+
+// ==================== AI 生成放映室 ====================
+async function aiGenPlayerRoom() {
+  const settings = loadSettings();
+  if (!settings.textApi.key) { toast('先去设置填 API Key'); showPage('settings'); return; }
+  if (!currentCard) { toast('先创建或选中一张角色卡'); return; }
+  
+  const status = document.getElementById('aiStatus');
+  const startTime = Date.now();
+  status.textContent = '生成放映室... 0秒';
+  const timer = setInterval(() => {
+    status.textContent = '生成放映室... ' + Math.floor((Date.now() - startTime) / 1000) + '秒';
+  }, 1000);
+  document.getElementById('aiPlayerRoomBtn').disabled = true;
+
+  const sysPrompt = `你是 lumeow-ai.com 顶级角色卡放映室设计师。任务流程：分析角色气质 → 设计视觉方案 → 输出完整 HTML+CSS 代码。你的作品要达到平台精品卡的水准。
+
+═══════════════════════════════
+【第一步 · 角色气质分析】
+═══════════════════════════════
+先在心里判断角色核心气质，匹配设计方向（不要输出分析过程）：
+- 暗黑/反派/SM/病娇/支配 → 深黑 + 暗红/血红/紫 + 锐利几何 + 暗影
+- 温柔/治愈/恋人/小奶狗 → 暖米/粉/浅青 + 软圆角 + 光斑飘絮 + 柔动画
+- 仙侠/古风/修仙 → 水墨色(青灰/墨绿/暖金) + 描边晕染 + 山水纹样 + 飞白
+- 赛博/机甲/未来 → 深灰黑 + 霓虹青/品红 + 硬边几何 + 扫描线/故障
+- 都市/校园/现代 → 玻璃拟态 + 几何分割 + 渐变背景 + 卡片投影
+- 尊贵/皇室/总裁/帝王 → 金/深蓝 + 奢华纹理 + 对称布局 + 金属光泽
+
+═══════════════════════════════
+【第二步 · 必须实现的 7 个要素】
+═══════════════════════════════
+★★★ 0. 移动端自适应布局（最重要）：
+   - ._user_root 用百分比/min-height，禁止固定 height: 700px 这种写法
+   - max-width: 420px 居中（手机宽度）
+   - 所有内容竖向排列（不要用 grid 左右分栏）
+   - 顺序：背景 → 图片（如果有）→ 标题 → 属性/标签 → 简介
+   - 图片如果有，放顶部或中间，宽度 80-100%
+   - ❌ 严禁做"手机外壳"（._user_phone 这种固定尺寸容器）：lumeow 本身就是移动端容器，不要套娃
+   - ✅ 正确做法：直接在 ._user_root 里放内容卡片/角色档案，不要再嵌套手机框架
+
+1. 多层背景（≥3 层叠加）：底层渐变/模糊图 + 中层装饰图形(光晕/烟雾/几何) + 顶层噪点或扫描线(opacity 0.05-0.15)
+   ⚠️ 文字可读性优先：深色背景要保证白色文字清晰可见，浅色背景保证深色文字可见，必要时加半透明遮罩层或 text-shadow
+2. 角色立绘/头像区：
+   · 有用户图片 → <img src=\"USER_IMAGE\"> 嵌入（前端自动替换为真实图片），配边框装饰+光晕阴影
+   · 无图片 → CSS 渐变色块占位
+3. 标题区：角色名(1.8-2.5em,700) + 副标题/称号/引言(0.9-1.1em,opacity .8) + text-shadow
+4. 标签或属性（选其一或组合）：药丸标签(3-6个) / 数据卡(姓名年龄身份等) / Tab切换(checkbox+label)
+5. 简介：2-4 段(line-height 1.7) + 可选名言块(border-left+italic+底色)
+6. 交互（≥2 种）：:hover 变化 + checkbox 切换侧栏/弹窗/选项卡 + @keyframes 入场(.8-1.5s) + 背景慢漂移(20-30s)
+7. 细节（≥3 种）：backdrop-filter blur 毛玻璃 + 多层 box-shadow + 渐变描边 + 装饰图标/分割线/角标 + 纹理
+
+═══════════════════════════════
+【第三步 · 视觉参考（学习神韵，不要照抄）】
+═══════════════════════════════
+参考1 仙侠「褚夷」：._user_root 直接放内容卡片（不套手机框），浅青绿 + 顶部引言 + 5个圆角标签 + 地点卡片，竖向排列
+参考2 暗黑古风「纪未逢」：._user_root 直接展示角色档案（不套手机框），金黑配色 + 顶部金色花纹圆盘 + 立绘居中 + 下方资料卡 + 折叠列表
+参考3 剑尊「江南雪」：._user_root 直接放卡片内容（不套手机框），蓝黑冷色 + 顶部logo + 竖排标题 + 立绘 + Tab切换，上下堆叠
+
+⚠️ 特殊场景提示：
+- 如果用户要求「偷看手机/手机锁屏/来电界面」等手机UI模拟场景，可以做手机外壳效果
+- 但必须用相对尺寸：._user_phone { max-width: 375px; aspect-ratio: 9/19.5; } 不要固定 height
+- 普通角色卡/档案/聊天记录等场景，直接在 ._user_root 里放内容，不要套手机框
+
+═══════════════════════════════
+【lumeow 技术规范 · 违反则代码无效】
+═══════════════════════════════
+✓ 必做：
+- ★★★ 整段必须 <style> 开头，</style> 后接 HTML（缺 <style> 会被当文本显示）
+- 只能 1 个 <style>，放最顶部
+- 所有类名加 _user_ 前缀（._user_card, ._user_title）
+- 根容器用 ._user_root，禁用 body/html 选择器
+- 字体只用系统字体：system-ui, -apple-system, "Songti SC", serif
+✗ 禁止：行内 style="..." / <script> / 外链资源(link,script src,@import url) / 嵌套 <style> / body,html 选择器
+✗ ★★★ 严禁任何行内 JS 事件：onerror= / onclick= / onload= / onmouseover= 等（lumeow 会检测到 JS 并拒绝渲染）
+  · 图片不要写 onerror，直接 <img src=\"USER_IMAGE\" alt=\"角色\">
+  · 交互一律用 CSS（checkbox+label+:checked），绝不用 JS
+交互写法：
+- Tab/弹窗：<input type=\\"checkbox\\" id=\\"t1\\" class=\\"_user_cb\\"><label for=\\"t1\\">...</label> 配 #t1:checked ~ ._user_panel{...}
+- checkbox 要用 CSS 隐藏：._user_cb{position:absolute;opacity:0;pointer-events:none}
+- hover：._user_btn:hover{transform:scale(1.05)}
+- 动画：@keyframes _user_fadeIn{from{opacity:0}to{opacity:1}}
+
+═══════════════════════════════
+【输出格式 · 严格遵守】
+═══════════════════════════════
+1. 只输出合法 JSON，无任何额外解释文字
+2. 唯一字段 playerRoom，值用 \`\`\`html ... \`\`\` 包裹
+3. JSON 字符串内所有 " 转义为 \\"（含 HTML 里的 class=\\"...\\"）
+4. 换行用 \\n（不要真实换行）
+5. ★重要★ < > & 字符直接写，不要写成 \\u003c \\u003e \\u0026
+6. 代码要完整丰富，CSS 写满细节，不要偷懒省略
+7. 对话引语用「」不用 ""
+
+示例：
+{"playerRoom":"\`\`\`html\\n<style>\\n._user_root{position:relative;background:linear-gradient(160deg,#0a0a12,#1a1020);color:#e8e2d6;padding:20px;max-width:420px;margin:0 auto;min-height:600px;overflow:hidden}\\n._user_card{position:relative;z-index:3;padding:24px}\\n@keyframes _user_in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}\\n</style>\\n<div class=\\"_user_root\\">\\n  <div class=\\"_user_card\\">内容</div>\\n</div>\\n\`\`\`"}`;
+
+  const roomImgData = document.getElementById('playerRoomImage')?.value || '';
+  const roomDescRaw = document.getElementById('storyPlayerRoom')?.value || '自由发挥';
+  // 文本里去掉已插入的 base64 <img>，避免巨大的 dataURL 塞进文本 prompt
+  const roomDesc = roomDescRaw.replace(/<img\s+src="data:[^"]*"[^>]*\/?>/gi, '').trim() || '自由发挥';
+  let userInput = `角色：${currentCard.role?.name || '未知'}
+性格：${currentCard.role?.personality || ''}
+世界观：${JSON.stringify(currentCard.story?.world || [])}
+故事：${currentCard.story?.name || ''}
+用户描述：${roomDesc}`;
+  if (roomImgData) {
+    userInput += `\n\n【用户上传的图片】用户提供了一张角色立绘/头像图片，请在生成的 HTML 里用 <img src=\\"USER_IMAGE\\"> 嵌入它（占位符 USER_IMAGE 前端会自动替换为真实图片），根据图片内容和角色气质设计整体风格、配色、布局。`;
+  }
+
+  try {
+    const result = await callOpenAIAPI(settings.textApi, sysPrompt, userInput, roomImgData ? [roomImgData] : null);
+    let jsonText = null;
+    const jsonBlock = result.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    if (jsonBlock) jsonText = jsonBlock[1];
+    else {
+      let depth = 0, inStr = false, esc = false, start = -1;
+      for (let i = 0; i < result.length; i++) {
+        const c = result[i];
+        if (esc) { esc = false; continue; }
+        if (c === '\\' && inStr) { esc = true; continue; }
+        if (c === '"') { inStr = !inStr; continue; }
+        if (inStr) continue;
+        if (c === '{') { if (depth === 0) start = i; depth++; }
+        else if (c === '}') { depth--; if (depth === 0 && start >= 0) { jsonText = result.slice(start, i + 1); break; } }
+      }
+      if (!jsonText) { const fb = result.match(/\{[\s\S]*\}/); if (fb) jsonText = fb[0]; }
+    }
+    if (!jsonText) throw new Error('找不到JSON，前100字：' + result.slice(0, 100));
+    let data;
+    try { data = JSON.parse(jsonText); }
+    catch (e) {
+      let fixed = tryFixBrokenJson(jsonText);
+      if (!fixed) fixed = repairJson(jsonText);
+      if (fixed) { data = JSON.parse(fixed); toast('自动修复成功'); }
+      else throw new Error('JSON失败：' + e.message + '\n前300字：' + result.slice(0, 300));
+    }
+    if (data.playerRoom) {
+      let finalCode = data.playerRoom;
+      
+      // 1. 先还原换行符（字面 \n 变成真实换行）
+      if (finalCode.includes('\\n')) {
+        finalCode = finalCode.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t');
+      }
+      
+      // 2. 剥离 markdown 代码块包裹（```html ... ```）
+      const codeBlockMatch = finalCode.match(/```(?:html|css|[a-z]*)\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        finalCode = codeBlockMatch[1].trim();
+      }
+      
+      // 3. 还原 unicode 转义（\u003c → <）
+      finalCode = finalCode.replace(/\\u003c/gi, '<').replace(/\\u003e/gi, '>').replace(/\\u0026/gi, '&');
+      
+      // 3.5. 删除行内 JS 事件（lumeow 不支持）
+      finalCode = finalCode.replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '');
+      
+      // 4. 替换图片占位符
+      const embedImage = document.getElementById('embedImageToggle')?.checked;
+      if (roomImgData && embedImage) {
+        const replaceCount = (finalCode.match(/USER_IMAGE/g) || []).length;
+        finalCode = finalCode.replace(/USER_IMAGE/g, roomImgData);
+        if (replaceCount > 0) {
+          const imgKb = Math.round(roomImgData.length / 1024);
+          console.log(`已替换 ${replaceCount} 处 USER_IMAGE，图片 ${imgKb}KB，总代码 ${Math.round(finalCode.length / 1024)}KB`);
+          if (imgKb > 200) toast(`图片较大(${imgKb}KB)，lumeow 可能截断导致裂图`);
+        } else {
+          console.warn('AI 代码里没有 USER_IMAGE 占位符');
+        }
+      } else {
+        // 不嵌入图片：把 USER_IMAGE 替换为渐变色块占位，避免裂图
+        if (finalCode.includes('USER_IMAGE')) {
+          finalCode = finalCode.replace(/<img[^>]*src="USER_IMAGE"[^>]*>/gi, '<div style="width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));border-radius:12px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:13px;">角色立绘</div>');
+          finalCode = finalCode.replace(/background-image:\s*url\(["']?USER_IMAGE["']?\)/gi, 'background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))');
+          finalCode = finalCode.replace(/USER_IMAGE/g, '');
+        }
+      }
+      
+      currentCard.story.playerRoom = finalCode;
+      setVal('storyPlayerRoom', finalCode);
+      saveCardFromEditor();
+      toast('放映室生成完成');
+      status.textContent = '放映室完成';
+      status.className = 'status success';
+    }
+  } catch (err) {
+    status.textContent = '失败: ' + err.message;
+    status.className = 'status error';
+    toast('失败: ' + err.message);
+  } finally {
+    clearInterval(timer);
+    document.getElementById('aiPlayerRoomBtn').disabled = false;
+  }
+}
+
+// ==================== AI 生成美化 ====================
+async function aiGenBeautify() {
+  const settings = loadSettings();
+  if (!settings.textApi.key) { toast('先去设置填 API Key'); showPage('settings'); return; }
+  if (!currentCard) { toast('先创建或选中一张角色卡'); return; }
+  
+  const status = document.getElementById('aiStatus');
+  const startTime = Date.now();
+  status.textContent = '生成美化... 0秒';
+  const timer = setInterval(() => {
+    status.textContent = '生成美化... ' + Math.floor((Date.now() - startTime) / 1000) + '秒';
+  }, 1000);
+  document.getElementById('aiBeautifyBtn').disabled = true;
+
+  const sysPrompt = `你是 lumeow-ai.com 角色卡美化代码专家。根据角色风格生成 beautify CSS 代码。
+
+【★★★★ 必读 - 失败案例示范】
+❌ 错误 1：不写 <style> 标签 → lumeow 把 CSS 当文本显示（红字报错）
+❌ 错误 2：写 body{...} → lumeow 平台 body 不可控，样式丢失
+❌ 错误 3：写 .bubble{...} → lumeow 内部已用 .bubble，会被覆盖（你以为生效实际没生效）
+❌ 错误 4：写 font-family: 'Noto Sans SC' → lumeow 沙箱没这个字体，回退成默认
+❌ 错误 5：写 <link href="...google fonts"> → lumeow 沙箱拦截外链，CSS 失效
+
+【★★★★ 正确示范 - 顾夜琛黑化帝王】
+\`\`\`html
+<style>
+._user_root{background:#121212;color:#e0e0e0;padding:20px;border-radius:12px;font-family:system-ui,-apple-system,sans-serif}
+._user_bubble{background:#1c2833;color:#f5f5f5;padding:12px 16px;border-radius:8px;margin:8px 0}
+._user_action{color:#b71c1c;font-style:italic;margin:6px 0}
+._user_accent{color:#b71c1c;font-weight:bold}
+</style>
+\`\`\`
+
+【硬性规则】
+1. 输出必须以 <style></style> 包裹（开头的 ★★★ 失败案例第 1 条）
+2. 容器用 ._user_root，不要用 body
+3. 对话用 ._user_bubble，不要用 .bubble
+4. 动作用 ._user_action，不要用 .action
+5. 字体只能用 system-ui, -apple-system, sans-serif
+6. 不引用任何外链字体/CSS
+7. 输出合法 JSON，只有一个字段 beautify
+8. beautify 是字符串，用 \`\`\`html ... \`\`\` 包裹整段
+9. 长度 80-200 字 CSS
+10. 配色按角色性格：黑化=深色+暗红、温柔=暖色+粉橙、清冷=冷色+白蓝
+11. 对白用「」不用 ""
+12. JSON 里只需把双引号 " 转义为 \\"，换行用 \\n；★千万不要★把 < > & 写成 \\u003c \\u003e \\u0026，直接写真实字符 < > &
+
+{"beautify":"\`\`\`html\\n<style>\\n._user_root{...}\\n._user_bubble{...}\\n._user_action{...}\\n</style>\\n\`\`\`"}`;
+
+  const beautifyImgData = document.getElementById('beautifyImage')?.value || '';
+  let userInput = `角色：${currentCard.role?.name || '未知'}\n风格：${currentCard.role?.personality || ''}\n分类：${currentCard.info?.category || ''}`;
+  if (beautifyImgData) {
+    userInput += `\n\n【用户上传的图片】用户提供了参考图，请据图调整配色和视觉风格。`;
+  }
+
+  try {
+    const result = await callOpenAIAPI(settings.textApi, sysPrompt, userInput, beautifyImgData ? [beautifyImgData] : null);
+    console.log('美化AI返回长度=', result.length);
+    let jsonText = null;
+    const jsonBlock = result.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    if (jsonBlock) jsonText = jsonBlock[1];
+    else {
+      let depth = 0, inStr = false, esc = false, start = -1;
+      for (let i = 0; i < result.length; i++) {
+        const c = result[i];
+        if (esc) { esc = false; continue; }
+        if (c === '\\' && inStr) { esc = true; continue; }
+        if (c === '"') { inStr = !inStr; continue; }
+        if (inStr) continue;
+        if (c === '{') { if (depth === 0) start = i; depth++; }
+        else if (c === '}') { depth--; if (depth === 0 && start >= 0) { jsonText = result.slice(start, i + 1); break; } }
+      }
+      if (!jsonText) { const fb = result.match(/\{[\s\S]*\}/); if (fb) jsonText = fb[0]; }
+    }
+    if (!jsonText) throw new Error('找不到JSON，前100字：' + result.slice(0, 100));
+    let data;
+    try { data = JSON.parse(jsonText); }
+    catch (e) {
+      let fixed = tryFixBrokenJson(jsonText);
+      if (!fixed) fixed = repairJson(jsonText);
+      if (fixed) { data = JSON.parse(fixed); toast('自动修复成功'); }
+      else throw new Error('JSON失败：' + e.message + '\n前300字：' + result.slice(0, 300));
+    }
+    if (data.beautify) {
+      let finalCode = data.beautify;
+      
+      // 1. 先还原换行符（字面 \n 变成真实换行）
+      if (finalCode.includes('\\n')) {
+        finalCode = finalCode.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t');
+      }
+      
+      // 2. 剥离 markdown 代码块包裹
+      const codeBlockMatch = finalCode.match(/```(?:html|css|[a-z]*)\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        finalCode = codeBlockMatch[1].trim();
+      }
+      
+      // 3. 还原 unicode 转义（\u003c → <）
+      finalCode = finalCode.replace(/\\u003c/gi, '<').replace(/\\u003e/gi, '>').replace(/\\u0026/gi, '&');
+      
+      currentCard.story.beautify = finalCode;
+      setVal('storyBeautify', finalCode);
+      saveCardFromEditor();
+      toast('美化生成完成');
+      status.textContent = '美化完成';
+      status.className = 'status success';
+    }
+  } catch (err) {
+    status.textContent = '失败: ' + err.message;
+    status.className = 'status error';
+    toast('失败: ' + err.message);
+  } finally {
+    clearInterval(timer);
+    document.getElementById('aiBeautifyBtn').disabled = false;
+  }
+}
+
+// ==================== 放映室模板按钮 ====================
+const templates = {
+  wechat: `做成微信聊天界面：
+- 顶部微信绿色导航栏，显示角色名
+- 模拟一段聊天记录（左边灰色气泡是他发的，右边绿色气泡是我发的）
+- 5-8 条对话，体现角色性格和关系
+- 可选：语音消息显示条、图片消息
+- 底部输入框 + 表情/语音/更多按钮
+- 整体仿微信风格（绿色主题或深色模式）`,
+  
+  weibo: `做成微博个人主页：
+- 顶部横幅背景图（用上传的图或渐变）
+- 头像 + 昵称 + 认证标识 + 简介
+- 关注/粉丝/微博数统计
+- 2-3 条微博动态卡片（带时间、点赞转发评论数）
+- 动态内容体现角色日常和性格
+- 整体仿微博橙白配色`,
+  
+  phone: `做成偷看手机界面：
+- 锁屏状态：时间、日期、状态栏（信号/电量）
+- 锁屏壁纸用上传的图（人物/风景）
+- 3-5 条推送通知预览（微信/短信/来电未接），内容暗示剧情
+- 底部滑动解锁提示
+- 可选：点击/hover 解锁后显示桌面（app 图标）`,
+  
+  chat: `做成聊天记录界面：
+- 类似短信或聊天 app 的对话列表
+- 10-15 条对话气泡（左右交替）
+- 内容可以是日常对话、告白、争吵、暧昧，体现情感线
+- 可选：时间戳、已读未读状态、撤回消息
+- 配色和风格根据角色性格调整`,
+  
+  call: `做成来电界面：
+- 全屏来电显示
+- 顶部"正在呼叫..."或"来电"
+- 居中大头像（圆形，用上传的图）
+- 角色名 + 备注（如"宝贝❤️"）
+- 底部接听/挂断按钮（绿色/红色）
+- 可选：视频通话选项、拒接短信
+- 背景模糊或渐变`,
+  
+  profile: `做成详细人物档案：
+内容要丰富，可以往下滚动，包含：
+- 顶部：角色名 + 称号 + 一句引言/台词
+- 基础资料卡：身份、性格、年龄、身高等
+- 详细人物小传（200 字以上背景故事）
+- 多个板块或 Tab 切换：「身世」「关系」「秘密」「语录」
+- 角色经典语录区（3-5 句台词）
+- 和玩家的关系说明
+- 风格配色根据角色气质设计`,
+  
+  ancient: `做成古风竹简卷轴：
+- 整体仿竹简/卷轴展开效果
+- 顶部印章装饰（朱红方印）
+- 繁体字或仿古字体
+- 内容：角色名号、来历、修为、师承、性情
+- 文笔用文言文/半白话
+- 装饰元素：祥云纹样、水墨晕染、毛笔笔触
+- 配色：古朴的赭石、墨色、暖金
+- 可选：卷轴两端圆木轴`
+};
+
+document.querySelectorAll('.template-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const template = this.dataset.template;
+    const textarea = document.getElementById('storyPlayerRoom');
+    if (templates[template]) {
+      textarea.value = templates[template];
+      textarea.focus();
+      // 滚动到 textarea 位置
+      textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+});
+
+document.getElementById('aiPlayerRoomBtn').addEventListener('click', aiGenPlayerRoom);
+document.getElementById('aiBeautifyBtn').addEventListener('click', aiGenBeautify);
+const aiGenStatusBarBtn = document.getElementById('aiGenStatusBarBtn');
+if (aiGenStatusBarBtn) aiGenStatusBarBtn.addEventListener('click', aiGenStatusBar);
+
+// ==================== 修复 AI 输出的 JSON ====================
+// AI 经常在 playerRoom / beautify 字段值里把 HTML 代码的双引号忘了转义
+// 这个函数扫描这两个字段，把 markdown 代码块 ``` ... ``` 内部的双引号和反斜杠做转义
+function tryFixBrokenJson(text) {
+  function fixField(inputText, fieldName) {
+    const fieldRe = new RegExp('"' + fieldName + '"\\s*:\\s*"');
+    const m = fieldRe.exec(inputText);
+    if (!m) return null;
+    const start = m.index + m[0].length;
+    // 定位 markdown 代码块的开/闭 fence（值里通常是 ```html ... ```）
+    const openIdx = inputText.indexOf('```', start);
+    if (openIdx < 0) return null;
+    const closeIdx = inputText.indexOf('```', openIdx + 3);
+    if (closeIdx < 0) return null;
+    // 值结束于"闭合 fence 之后"的第一个未转义双引号（避免被 HTML 里 class="x" 的引号误判）
+    let end = -1;
+    for (let i = closeIdx + 3; i < inputText.length; i++) {
+      if (inputText[i] === '"' && inputText[i - 1] !== '\\') { end = i; break; }
+    }
+    if (end < 0) return null;
+    const valueStr = inputText.slice(start, end);
+    // 修复 markdown 代码块内部
+    const fixed = valueStr.replace(/```([a-zA-Z0-9]*)\s*([\s\S]*?)```/, (full, lang, code) => {
+      const escaped = code
+        .replace(/\\\\/g, '\x00')
+        .replace(/\\"/g, '\x01')
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/\t/g, '\\t')
+        .replace(/\x00/g, '\\\\')
+        .replace(/\x01/g, '\\"');
+      return '```' + lang + '\\n' + escaped + '\\n```';
+    });
+    if (fixed === valueStr) return null;
+    return inputText.slice(0, start) + fixed + inputText.slice(end);
+  }
+  // 链式修复：先修 playerRoom，再在修复结果上修 beautify。任一字段修复成功都保留
+  let result = text;
+  let changed = false;
+  const r1 = fixField(result, 'playerRoom');
+  if (r1) { result = r1; changed = true; }
+  const r2 = fixField(result, 'beautify');
+  if (r2) { result = r2; changed = true; }
+  return changed ? result : null;
+}
+function repairJson(text) {
+  let t = text;
+  t = t.replace(/\u201c/g, '\u300c');
+  t = t.replace(/\u201d/g, '\u300d');
+  t = t.replace(/\u2018/g, '\u300e');
+  t = t.replace(/\u2019/g, '\u300f');
+  t = t.replace(/,\s*}/g, '}');
+  t = t.replace(/,\s*]/g, ']');
+  t = t.replace(/\u0000/g, '');
+  t = t.replace(/\r/g, '');
+  let depth = 0, inStr = false, esc = false;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (esc) { esc = false; continue; }
+    if (c === '\\' && inStr) { esc = true; continue; }
+    if (c === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (c === '{' || c === '[') depth++;
+    if (c === '}' || c === ']') depth--;
+  }
+  if (inStr) t += '"';
+  while (depth > 0) { t += '}'; depth--; }
+  return t.trim();
+}
+
+
+// ==================== Token 用量统计 ====================
+function loadTokenUsage() {
+  try { return JSON.parse(localStorage.getItem('ccw:tokenUsage')) || { total: 0, prompt: 0, completion: 0, calls: 0, byModel: {} }; }
+  catch (e) { return { total: 0, prompt: 0, completion: 0, calls: 0, byModel: {} }; }
+}
+function saveTokenUsage(u) { localStorage.setItem('ccw:tokenUsage', JSON.stringify(u)); }
+function addTokenUsage(usage, model) {
+  const u = loadTokenUsage();
+  const total = usage.total_tokens || ((usage.prompt_tokens || 0) + (usage.completion_tokens || 0));
+  u.total += total;
+  u.prompt += usage.prompt_tokens || 0;
+  u.completion += usage.completion_tokens || 0;
+  u.calls += 1;
+  if (model) {
+    u.byModel[model] = (u.byModel[model] || 0) + total;
+  }
+  saveTokenUsage(u);
+  updateTokenUsageUI();
+}
+function formatTokens(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(2) + ' 百万';
+  if (n >= 1000) return (n / 1000).toFixed(1) + ' 千';
+  return n.toString();
+}
+function updateTokenUsageUI() {
+  const u = loadTokenUsage();
+  // 免费额度参考值（通义千问 100万）
+  const FREE_QUOTA = 1000000;
+  const used = u.total || 0;
+  const percent = Math.min(100, (used / FREE_QUOTA) * 100);
+  const remaining = Math.max(0, FREE_QUOTA - used);
+  // 模型明细
+  const modelLines = Object.entries(u.byModel || {}).map(([m, t]) => `${m}: ${formatTokens(t)}`).join(' · ');
+  const el = document.getElementById('tokenUsageDisplay');
+  if (el) {
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+        <span>📊 累计已用：<b>${formatTokens(used)}</b> Token（${u.calls || 0} 次调用）</span>
+        <span style="color:${percent > 80 ? '#e74c3c' : 'var(--text-muted)'};">${percent.toFixed(1)}%</span>
+      </div>
+      <div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:4px;">
+        <div style="height:100%;width:${percent}%;background:${percent > 80 ? '#e74c3c' : percent > 50 ? '#f39c12' : '#2ecc71'};transition:width .3s;"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);">
+        剩余额度（按 100万免费估算）：${formatTokens(remaining)} · 输入 ${formatTokens(u.prompt)} / 输出 ${formatTokens(u.completion)}
+        ${modelLines ? '<br>模型明细：' + modelLines : ''}
+      </div>
+    `;
+  }
+}
+
+// ==================== API 调用 ====================
+async function callOpenAIAPI(api, sysPrompt, userInput, images) {
+  let resp;
+  // 有参考图时用多模态 content 数组（gemini/gpt-4o 等视觉模型支持），否则纯文本
+  let userContent;
+  if (images && images.length) {
+    userContent = [{ type: 'text', text: userInput }];
+    images.forEach(url => userContent.push({ type: 'image_url', image_url: { url } }));
+  } else {
+    userContent = userInput;
+  }
+  try {
+    resp = await fetch(api.base.replace(/\/$/, '') + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + api.key },
+      body: JSON.stringify({
+        model: api.model,
+        messages: [
+          { role: 'system', content: sysPrompt },
+          { role: 'user', content: userContent }
+        ],
+        temperature: 0.5,
+        max_tokens: 8000
+      })
+    });
+  } catch (e) {
+    // fetch 本身失败（网络不通 / URL 错 / 跨域）
+    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError') || e.message.includes('network')) {
+      throw new Error('网络请求失败，检查：1) 设置里 Base URL 是否正确  2) 手机/电脑是否能访问该网址  3) 如果是本地文件打开，某些浏览器会拦截跨域请求，试试用 Safari 打开或部署到服务器');
+    }
+    throw e;
+  }
+  if (!resp.ok) {
+    const txt = await resp.text();
+    if (resp.status === 401) throw new Error('API Key 无效或已过期，去设置检查');
+    if (resp.status === 404) throw new Error('模型不存在或 Base URL 路径错误，检查模型名和 Base URL');
+    if (resp.status === 429) throw new Error('API 调用太频繁，稍等几秒重试');
+    throw new Error('HTTP ' + resp.status + ' ' + txt.slice(0, 100));
+  }
+  const data = await resp.json();
+  if (!data.choices || !data.choices[0]) throw new Error('API 返回格式异常，检查模型是否支持 chat/completions');
+  // 累计 Token 用量到本地
+  if (data.usage) addTokenUsage(data.usage, api.model);
+  const content = data.choices?.[0]?.message?.content || '';
+  console.log('AI返回长度=', content.length);
+  return content;
+}
+
+async function callCozeAPI(api, sysPrompt, userInput) {
+  // 扣子 v3：api.model 填 Bot ID，api.key 填 PAT
+  const botId = api.model;
+  const base = 'https://api.coze.cn';
+  const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + api.key };
+  // 1) 发起对话（异步，必须 auto_save_history=true 才能事后取消息）
+  const initResp = await fetch(base + '/v3/chat', {
+    method: 'POST', headers,
+    body: JSON.stringify({
+      bot_id: botId,
+      user_id: 'user_' + Date.now(),
+      stream: false,
+      auto_save_history: true,
+      additional_messages: [
+        { role: 'user', content: '（系统设定：' + sysPrompt + '）\n\n' + userInput, content_type: 'text' }
+      ]
+    })
+  });
+  if (!initResp.ok) { const t = await initResp.text(); throw new Error('Coze HTTP ' + initResp.status + ' ' + t.slice(0, 100)); }
+  const initData = await initResp.json();
+  if (initData.code && initData.code !== 0) throw new Error('Coze 错误 ' + initData.code + '：' + (initData.msg || ''));
+  const chatId = initData.data && initData.data.id;
+  const convId = initData.data && initData.data.conversation_id;
+  if (!chatId || !convId) throw new Error('Coze 未返回 chat_id / conversation_id');
+  // 2) 轮询直到 completed（约 90 秒上限）
+  let status = initData.data.status;
+  const q = '?chat_id=' + encodeURIComponent(chatId) + '&conversation_id=' + encodeURIComponent(convId);
+  for (let i = 0; i < 60 && status !== 'completed'; i++) {
+    await new Promise(r => setTimeout(r, 1500));
+    const rResp = await fetch(base + '/v3/chat/retrieve' + q, { headers });
+    const rData = await rResp.json();
+    status = rData.data && rData.data.status;
+    if (status === 'failed' || status === 'requires_action') throw new Error('Coze 对话状态：' + status);
+  }
+  if (status !== 'completed') throw new Error('Coze 轮询超时（90 秒未完成）');
+  // 3) 取 assistant 的 answer 消息
+  const listResp = await fetch(base + '/v3/chat/message/list' + q, { headers });
+  const listData = await listResp.json();
+  const msgs = listData.data || [];
+  const answer = msgs.filter(m => m.role === 'assistant' && m.type === 'answer').map(m => m.content).join('');
+  return answer || (msgs.length ? msgs[msgs.length - 1].content : '');
+}
+
+// ==================== 复制 / 下载 ====================
+function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  } else {
+    return Promise.resolve(fallbackCopy(text));
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+document.getElementById('copyLumeowBtn').addEventListener('click', () => {
+  if (!currentCard) return;
+  saveCardFromEditor();
+  const lumeow = buildLumeowFormat(currentCard);
+  copyToClipboard(JSON.stringify(lumeow, null, 2));
+  toast('已复制 lumeow 格式到剪贴板');
+});
+
+function buildLumeowFormat(c) {
+  return {
+    title: c.info.name,
+    category: c.info.category,
+    tags: (c.info.tags || '').split(',').map(s => s.trim()).filter(Boolean),
+    rating: c.info.rating,
+    source: c.info.source,
+    customSettings: c.info.custom,
+    visibility: c.info.visibility,
+    intro: c.info.intro,
+    avatar: c.info.avatar,
+    cover: c.info.cover,
+    characters: [{
+      name: c.role.name,
+      age: c.role.age,
+      appearance: c.role.appearance,
+      personality: c.role.personality,
+      heart: c.role.heart,
+      conflict: c.role.conflict,
+      situation: c.role.situation,
+      relation: c.role.relation
+    }],
+    player: {
+      name: c.player.name,
+      gender: c.player.gender,
+      initial: c.player.initial
+    },
+    stories: [{
+      name: c.story.name,
+      intro: c.story.intro,
+      tags: (c.story.tags || '').split(',').map(s => s.trim()).filter(Boolean),
+      image: c.story.image,
+      playerRoomCode: c.story.playerRoom,
+      openingMain: c.story.opening,
+      openingStatus: c.story.status,
+      worldView: c.story.world,
+      beautifyCode: c.story.beautify
+    }]
+  };
+}
+
+document.getElementById('downloadJsonBtn').addEventListener('click', () => {
+  if (!currentCard) return;
+  saveCardFromEditor();
+  const blob = new Blob([JSON.stringify(currentCard, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (currentCard.info.name || '角色卡') + '.json';
+  a.click();
+});
+
+document.getElementById('saveDraftBtn').addEventListener('click', () => {
+  document.getElementById('saveBtn').click();
+});
+
+document.getElementById('previewBtn').addEventListener('click', () => {
+  if (!currentCard) return;
+  saveCardFromEditor();
+  const c = currentCard;
+  document.getElementById('previewTitle').textContent = c.info.name || '预览';
+  document.getElementById('previewBody').innerHTML = `
+    ${c.info.avatar ? `<img src="${c.info.avatar}" style="width: 100%; max-width: 200px; border-radius: 8px; margin-bottom: 12px;">` : ''}
+    <h3>${escapeHtml(c.info.name || '未命名')}</h3>
+    <p style="color: #888; margin: 4px 0;">${escapeHtml(c.info.category)} · ${escapeHtml(c.info.tags)}</p>
+    <p style="margin: 8px 0;">${escapeHtml(c.info.intro)}</p>
+    <h4 style="margin-top: 16px; color: #8ab4f8;">角色：${escapeHtml(c.role.name || '未填')}</h4>
+    <p style="color: #888; font-size: 12px;">年龄：${escapeHtml(c.role.age || '未填')}</p>
+    <p style="margin: 4px 0;"><b>外貌：</b>${escapeHtml(c.role.appearance)}</p>
+    <p style="margin: 4px 0;"><b>性格：</b>${escapeHtml(c.role.personality)}</p>
+    <p style="margin: 4px 0;"><b>内心：</b>${escapeHtml(c.role.heart)}</p>
+    <p style="margin: 4px 0;"><b>矛盾：</b>${escapeHtml(c.role.conflict)}</p>
+    <p style="margin: 4px 0;"><b>特定反应：</b>${escapeHtml(c.role.situation)}</p>
+    <p style="margin: 4px 0;"><b>不同关系：</b>${escapeHtml(c.role.relation)}</p>
+    <h4 style="margin-top: 16px; color: #8ab4f8;">玩家：${escapeHtml(c.player.name || '未填')}</h4>
+    <p style="margin: 4px 0;">${escapeHtml(c.player.initial)}</p>
+    <h4 style="margin-top: 16px; color: #8ab4f8;">故事：${escapeHtml(c.story.name || '未填')}</h4>
+    <p style="color: #888; font-size: 12px;">${escapeHtml(c.story.tags)}</p>
+    <p style="margin: 4px 0;">${escapeHtml(c.story.intro)}</p>
+    <div style="margin-top: 12px; padding: 12px; background: #15151a; border-radius: 6px; white-space: pre-wrap; font-size: 13px;">${escapeHtml(c.story.opening)}</div>
+    ${c.story.status ? `<p style="color: #aaa; font-size: 12px; margin-top: 6px;">[状态栏] ${escapeHtml(c.story.status)}</p>` : ''}
+  `;
+  document.getElementById('previewModal').classList.add('active');
+});
+document.getElementById('closePreviewBtn').addEventListener('click', () => {
+  document.getElementById('previewModal').classList.remove('active');
+});
+
+// ==================== 设置页 ====================
+function loadSettingsUI() {
+  const s = loadSettings();
+  setVal('textApiType', s.textApi.type);
+  setVal('textApiKey', s.textApi.key);
+  setVal('textApiModel', s.textApi.model);
+  setVal('textApiBase', s.textApi.base);
+  updateTokenUsageUI();
+}
+
+function saveSettingsFromUI() {
+  const s = {
+    textApi: {
+      type: getVal('textApiType'), key: getVal('textApiKey'),
+      model: getVal('textApiModel'), base: getVal('textApiBase')
+    }
+  };
+  saveSettings(s);
+}
+
+['textApiType','textApiKey','textApiModel','textApiBase'].forEach(id => {
+  document.getElementById(id).addEventListener('change', saveSettingsFromUI);
+  document.getElementById(id).addEventListener('blur', saveSettingsFromUI);
+});
+
+// 预设按钮一键填入
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('textApiType').value = 'openai';
+    document.getElementById('textApiKey').value = btn.dataset.key;
+    document.getElementById('textApiModel').value = btn.dataset.model;
+    document.getElementById('textApiBase').value = btn.dataset.base;
+    saveSettingsFromUI();
+    toast('已填入预设配置');
+  });
+});
+
+// 重置 Token 用量统计
+const resetTokenBtn = document.getElementById('resetTokenUsageBtn');
+if (resetTokenBtn) {
+  resetTokenBtn.addEventListener('click', () => {
+    if (confirm('确定清零 Token 用量统计？')) {
+      saveTokenUsage({ total: 0, prompt: 0, completion: 0, calls: 0, byModel: {} });
+      updateTokenUsageUI();
+      toast('已清零');
+    }
+  });
+}
+
+document.getElementById('textApiType').addEventListener('change', (e) => {
+  const t = e.target.value;
+  const baseEl = document.getElementById('textApiBase');
+  const modelEl = document.getElementById('textApiModel');
+  if (t === 'openai' && !baseEl.value) baseEl.value = 'https://api.openai.com/v1';
+  if (t === 'coze') modelEl.placeholder = 'Bot ID（扣子机器人 ID）';
+  if (t === 'openai' && !modelEl.value) modelEl.value = 'gpt-4o-mini';
+  saveSettingsFromUI();
+});
+
+document.getElementById('testTextApiBtn').addEventListener('click', async () => {
+  const s = loadSettings();
+  if (!s.textApi.key) { toast('先填 API Key'); return; }
+  const status = document.getElementById('textApiStatus');
+  const startTime = Date.now();
+  status.textContent = '测试中... 0秒';
+  const timer = setInterval(() => {
+    status.textContent = '测试中... ' + Math.floor((Date.now() - startTime) / 1000) + '秒';
+  }, 1000);
+  try {
+    let result;
+    if (s.textApi.type === 'coze') {
+      result = await callCozeAPI(s.textApi, '你是助手', '用一句话自我介绍');
+    } else {
+      const resp = await fetch(s.textApi.base.replace(/\/$/, '') + '/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.textApi.key },
+        body: JSON.stringify({
+          model: s.textApi.model,
+          messages: [{ role: 'user', content: '用一句话自我介绍' }],
+          max_tokens: 50
+        })
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      result = data.choices[0].message.content;
+    }
+    clearInterval(timer);
+    status.textContent = 'OK: ' + (result || '').slice(0, 30);
+    status.className = 'status success';
+    toast('测试成功');
+  } catch (err) {
+    clearInterval(timer);
+    status.textContent = '失败: ' + err.message;
+    status.className = 'status error';
+    toast('失败: ' + err.message);
+  }
+});
+
+function exportAllData() {
+  const data = { cards: loadCards(), settings: loadSettings() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '角色卡工坊_备份_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+}
+document.getElementById('exportAllBtn').addEventListener('click', exportAllData);
+const _exportAllBtn2 = document.getElementById('exportAllBtn2');
+if (_exportAllBtn2) _exportAllBtn2.addEventListener('click', exportAllData);
+document.getElementById('importAllBtn').addEventListener('click', () => document.getElementById('importAllFile').click());
+document.getElementById('importAllFile').addEventListener('change', (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.cards) saveCards(data.cards.map(normalizeCard));
+      if (data.settings) saveSettings(data.settings);
+      loadSettingsUI();
+      renderCardList();
+      toast('已导入');
+    } catch (err) { toast('解析失败'); }
+  };
+  reader.readAsText(f);
+  e.target.value = '';
+});
+document.getElementById('clearAllBtn').addEventListener('click', () => {
+  if (confirm('确定清空所有数据？此操作不可恢复！')) {
+    localStorage.removeItem(STORAGE.CARDS);
+    localStorage.removeItem(STORAGE.SETTINGS);
+    renderCardList();
+    toast('已清空');
+  }
+});
+
+// ==================== 复制按钮（每个字段单独复制） ====================
+function addCopyButtons() {
+  // 三个 tab 内的 text input + textarea，每个加一个右上角"复制"小按钮
+  const tabIds = ['infoTab', 'roleTab', 'storyTab'];
+  tabIds.forEach(tabId => {
+    const tab = document.getElementById(tabId);
+    if (!tab) return;
+    const targets = tab.querySelectorAll('input[type="text"], textarea');
+    targets.forEach(el => {
+      if (el.dataset.copyAdded) return;
+      el.dataset.copyAdded = '1';
+      // 包一层 div（如果还没包）
+      let wrap = el.parentElement;
+      if (!wrap.classList.contains('input-wrap')) {
+        wrap = document.createElement('div');
+        wrap.className = 'input-wrap';
+        el.parentNode.insertBefore(wrap, el);
+        wrap.appendChild(el);
+      }
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn';
+      btn.textContent = '复制';
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const text = el.value || '';
+        if (!text) { toast('空的，没东西可复制'); return; }
+        copyToClipboard(text);
+        toast('已复制');
+      });
+      wrap.appendChild(btn);
+    });
+  });
+}
+
+// ==================== 初始化 ====================
+loadSettings();
+renderCardList();
+addCopyButtons();
+</script>
+</body>
+</html>
